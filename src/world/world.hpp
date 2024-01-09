@@ -1,12 +1,12 @@
 #ifndef WORLD_WORLD_HPP
 #define WORLD_WORLD_HPP
 
-namespace World {
+namespace Map {
     class Chunk {
+    public:
         const static int chunk_size_x = 16;
         const static int chunk_size_y = 16;
 
-    public:
         int Data[chunk_size_y][chunk_size_x];
 
         Chunk();
@@ -24,17 +24,17 @@ namespace World {
     };
 
     class World {
+    public:
         const static int world_size_x = 2;
         const static int world_size_y = 2;
 
-    public:
-        Chunk Data[world_size_y][world_size_x];
+        Chunk* Data[world_size_y][world_size_x];
 
-        void SetChunk(int y, int x, Chunk chunk);
+        void SetChunk(int y, int x, Chunk* chunk);
         void SetCell(int y, int x, int data);
         void SetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x, int data);
 
-        Chunk GetChunk(int y, int x);
+        Chunk* GetChunk(int y, int x);
         int GetCell(int y, int x);
         int GetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x);
     };
