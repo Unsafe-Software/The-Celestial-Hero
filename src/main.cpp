@@ -4,7 +4,7 @@
 
 #include "config.hpp"
 #include "world/world.hpp"
-#include "gfx/sprites.hpp"
+#include "gfx/gfx.hpp"
 
 int main() {
     std::cout << "Booting up " << Config::Name << " " << Config::Version << ";" << std::endl;
@@ -16,8 +16,7 @@ int main() {
     InitWindow(640, 480, "The Celestial Hero");
     SetTargetFPS(60);
 
-    GFX::Sprite* sprite_black = new GFX::Sprite("./assets/texture_black.png");
-    GFX::Sprite* sprite_white = new GFX::Sprite("./assets/texture_white.png");
+    GFX::SpriteList* sprites = new GFX::SpriteList("./assets/sprites.txt");
 
     Map::Chunk* chunk = new Map::Chunk();
     for (int y = 0; y < chunk->chunk_size_y; ++y) {
@@ -32,7 +31,7 @@ int main() {
 
         for (int y = 0; y < chunk->chunk_size_y; ++y) {
             for (int x = 0; x < chunk->chunk_size_x; ++x) {
-                chunk->Data[y][x] == 1 ? sprite_white->Draw(y * 16, x * 16) : sprite_black->Draw(y * 16, x * 16);
+                sprites->Get(chunk->Data[y][x])->Draw(y * 16, x * 16);
             }
         }
 

@@ -1,5 +1,4 @@
-#ifndef WORLD_WORLD_HPP
-#define WORLD_WORLD_HPP
+#pragma once
 
 namespace Map {
     class Chunk {
@@ -39,5 +38,3 @@ namespace Map {
         int GetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x);
     };
 }
-
-#endif // WORLD_WORLD_HPP
