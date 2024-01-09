@@ -93,6 +93,14 @@ namespace Map {
     return result_data;
   }
 
+  World::World() {
+    for (int y = 0; y < world_size_y; ++y) {
+      for (int x = 0; x < world_size_x; ++x) {
+        Data[y][x] = new Chunk();
+      }
+    }
+  }
+
   void World::SetChunk(int y, int x, Chunk* chunk) {
     if (y < 0 || y >= chunk->chunk_size_y ||
         x < 0 || x >= chunk->chunk_size_x) {

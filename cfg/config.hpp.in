@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+#define TILE_SIZE 16
+
 namespace Config {
     std::string License = "The-Celestial-Hero Copyright (C) 2023  Unsafe Software\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions.";
     std::string Name = "\x1b[1m${PROJECT_NAME}\x1b[0m";

@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-
 #include "sprites.hpp"
 #include "../world/world.hpp"
 

@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-
 #include "sprites.hpp"
 #include "../world/world.hpp"
 

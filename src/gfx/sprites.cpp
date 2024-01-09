@@ -1,7 +1,6 @@
 #include "sprites.hpp"
 #include <iostream>
 #include <string>
-
 #include <raylib.h>
 
 namespace GFX {

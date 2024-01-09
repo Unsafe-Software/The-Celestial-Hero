@@ -5,11 +5,9 @@ namespace Map {
     public:
         const static int chunk_size_x = 16;
         const static int chunk_size_y = 16;
-
         int Data[chunk_size_y][chunk_size_x];
 
         Chunk();
-        ~Chunk();
 
         void SetDataCell(int y, int x, int tile);
         void SetDataRow(int y, int tiles[chunk_size_x]);
@@ -26,8 +24,9 @@ namespace Map {
     public:
         const static int world_size_x = 2;
         const static int world_size_y = 2;
-
         Chunk* Data[world_size_y][world_size_x];
+
+        World();
 
         void SetChunk(int y, int x, Chunk* chunk);
         void SetCell(int y, int x, int data);
