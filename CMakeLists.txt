@@ -5,9 +5,14 @@ set(CMAKE_CXX_STANDARD 11)
 # --- Config ---
 configure_file(
   "${PROJECT_SOURCE_DIR}/cfg/config.hpp.in"
-  "${PROJECT_BINARY_DIR}/config.hpp"
+  "${PROJECT_SOURCE_DIR}/src/config.hpp"
 )
-include_directories("${PROJECT_BINARY_DIR}")
+
+# --- Assets ---
+file(
+  COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 # --- Libraries ---
 include(FetchContent)
@@ -20,7 +25,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 
 # --- Executables ---
-file(GLOB Sources src/*.cpp)
+file(GLOB Sources src/*.cpp src/gfx/*.cpp src/world/*.cpp)
 add_compile_definitions("RELEASE=$<CONFIG:Release>")
 add_executable("${PROJECT_NAME}" ${Sources})
 target_link_libraries("${PROJECT_NAME}" raylib)
