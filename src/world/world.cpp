@@ -1,13 +1,11 @@
 #include "world.hpp"
 #include <iostream>
-#include <cstdlib>
 
 namespace Map {
   Chunk::Chunk() {
-    std::srand(0);
     for (int y = 0; y < chunk_size_y; ++y) {
       for (int x = 0; x < chunk_size_x; ++x) {
-        Data[y][x] = std::rand() % 2;
+        Data[y][x] = 0;
       }
     }
   }
@@ -15,8 +13,7 @@ namespace Map {
   void Chunk::SetDataCell(int y, int x, int tile) {
     if (y < 0 || y >= chunk_size_y ||
         x < 0 || x >= chunk_size_x) {
-      std::cerr << "Chunk::SetDataCell outside of chunk size." << std::endl;
-      exit(1);
+      return;
     }
 
     Data[y][x] = tile;
@@ -24,8 +21,7 @@ namespace Map {
 
   void Chunk::SetDataRow(int y, int tiles[chunk_size_x]) {
     if (y < 0 || y >= chunk_size_y) {
-      std::cerr << "Chunk::SetDataRow outside of chunk size." << std::endl;
-      exit(1);
+      return;
     }
 
     for (int x = 0; x < chunk_size_x; ++x) {
@@ -35,8 +31,7 @@ namespace Map {
 
   void Chunk::SetDataCol(int x, int tiles[chunk_size_y]) {
     if (x < 0 || x >= chunk_size_x) {
-      std::cerr << "Chunk::SetDataCol outside of chunk size." << std::endl;
-      exit(1);
+      return;
     }
 
     for (int y = 0; y < chunk_size_y; ++y) {
@@ -47,8 +42,7 @@ namespace Map {
   int Chunk::GetDataCell(int y, int x) {
     if (y < 0 || y >= chunk_size_y ||
         x < 0 || x >= chunk_size_x) {
-      std::cerr << "Chunk::GetDataCell outside of chunk size." << std::endl;
-      exit(1);
+      return 0;
     }
 
     return Data[y][x];
@@ -56,8 +50,7 @@ namespace Map {
 
   int* Chunk::GetDataRow(int y) {
     if (y < 0 || y >= chunk_size_y) {
-      std::cerr << "Chunk::GetDataRow outside of chunk size." << std::endl;
-      exit(1);
+      return {};
     }
 
     static int result_data[chunk_size_x];
@@ -69,8 +62,7 @@ namespace Map {
 
   int* Chunk::GetDataCol(int x) {
     if (x < 0 || x > chunk_size_x) {
-      std::cerr << "Chunk::GetDataCol outside of chunk size." << std::endl;
-      exit(1);
+      return {};
     }
 
     static int result_data[chunk_size_y];
@@ -104,8 +96,7 @@ namespace Map {
   void World::SetChunk(int y, int x, Chunk* chunk) {
     if (y < 0 || y >= chunk->chunk_size_y ||
         x < 0 || x >= chunk->chunk_size_x) {
-      std::cerr << "World::SetChunk outside of chunk size." << std::endl;
-      exit(1);
+      return;
     }
 
     Data[y][x] = chunk;
@@ -114,8 +105,7 @@ namespace Map {
   void World::SetCell(int y, int x, int data) {
     if (y < 0 || y >= world_size_y * Data[0][0]->chunk_size_y ||
         x < 0 || x >= world_size_x * Data[0][0]->chunk_size_x) {
-      std::cerr << "World::SetCell outside of world size." << std::endl;
-      exit(1);
+      return;
     }
 
     int chunk_y = y / Data[0][0]->chunk_size_y;
@@ -129,15 +119,27 @@ namespace Map {
   void World::SetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x, int data) {
     if (in_chunk_y < 0 || in_chunk_y >= Data[0][0]->chunk_size_y ||
         in_chunk_x < 0 || in_chunk_x >= Data[0][0]->chunk_size_x) {
-      std::cerr << "World::SetCellByChunk outside of chunk side." << std::endl;
-      exit(1);
+      return;
     }
     if (chunk_y < 0 || chunk_y >= world_size_y ||
         chunk_x < 0 || chunk_x >= world_size_x) {
-      std::cerr << "World::SetCellByChunk outside of chunk side." << std::endl;
-      exit(1);
+      return;
     }
 
     Data[chunk_y][chunk_x]->Data[in_chunk_y][in_chunk_x] = data;
+  }
+
+  int World::GetCell(int y, int x) {
+    if (y < 0 || y >= world_size_y * Data[0][0]->chunk_size_y ||
+        x < 0 || x >= world_size_x * Data[0][0]->chunk_size_x) {
+      return 0;
+    }
+
+    int chunk_y = y / Data[0][0]->chunk_size_y;
+    int chunk_x = x / Data[0][0]->chunk_size_x;
+    int in_chunk_y = y - chunk_y * Data[0][0]->chunk_size_y;
+    int in_chunk_x = x - chunk_x * Data[0][0]->chunk_size_x;
+
+    return Data[chunk_y][chunk_x]->Data[in_chunk_y][in_chunk_x];
   }
 }

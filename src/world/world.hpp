@@ -22,8 +22,10 @@ namespace Map {
 
     class World {
     public:
-        const static int world_size_x = 2;
-        const static int world_size_y = 2;
+        // const static int world_size_x = 60;
+        // const static int world_size_y = 34;
+        const static int world_size_x = 30;
+        const static int world_size_y = 17;
         Chunk* Data[world_size_y][world_size_x];
 
         World();

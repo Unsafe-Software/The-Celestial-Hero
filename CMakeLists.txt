@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # --- Config ---
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cfg/config.hpp.in"
+  "${PROJECT_SOURCE_DIR}/cfg/config.in.hpp"
   "${PROJECT_SOURCE_DIR}/src/config.hpp"
 )
 

@@ -1,2 +1,4 @@
-texture_black.png
-texture_white.png
+air.png
+dirt.png
+stone.png
+air_cave.png

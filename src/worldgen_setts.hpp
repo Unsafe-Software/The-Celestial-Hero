@@ -1,0 +1,4 @@
+#pragma once
+
+#define DIRT_LEVEL_PERCENT_START 30
+#define STONE_LEVEL_PERCENT_START 45

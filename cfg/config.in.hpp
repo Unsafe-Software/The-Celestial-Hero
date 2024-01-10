@@ -1,7 +1,12 @@
 #pragma once
 #include <string>
 
-#define TILE_SIZE 16
+#define WORLD_SIZE_Y 200
+#define WORLD_SIZE_X 300
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 576
+#define TILE_SIZE 2
+#define PLAYER_SPEED 2.0f
 
 namespace Config {
     std::string License = "The-Celestial-Hero Copyright (C) 2023  Unsafe Software\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions.";
