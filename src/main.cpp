@@ -34,6 +34,7 @@ int main() {
     int step = 0;
     int seed = 0;
     bool space_pressed = false;
+    Map::GenerateWorld(world, sprites);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -43,41 +44,9 @@ int main() {
         if (IsKeyDown(KEY_UP)    || IsKeyDown(KEY_W)) cam_pos.y -= PLAYER_SPEED;
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) cam_pos.x += PLAYER_SPEED;
         if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) cam_pos.x -= PLAYER_SPEED;
-        if (IsKeyPressed(KEY_SPACE)) {
-            ++step;
-            switch (step) {
-            case 1:
-                Map::GenerateWorldStepOne(world, sprites);
-                break;
-            case 2:
-                Map::GenerateWorldStepTwo(world, sprites, seed);
-                break;
-            case 3:
-                Map::GenerateWorldStepThree(world, sprites, seed);
-                break;
-            case 4:
-                Map::GenerateWorldStepFour(world, sprites, seed);
-                break;
-            case 5:
-                Map::GenerateWorldStepFive(world, sprites, seed);
-                break;
-            case 6:
-                Map::GenerateWorldStepSeven(world, sprites, seed);
-                break;
-            case 7:
-                Map::GenerateWorldStepSix(world, sprites, seed);
-                break;
-            }
-        }
-        if (IsKeyPressed(KEY_F)) {
-            Map::GenerateWorldStepOne(world, sprites);
-            Map::GenerateWorldStepTwo(world, sprites, seed);
-            Map::GenerateWorldStepThree(world, sprites, seed);
-            Map::GenerateWorldStepFour(world, sprites, seed);
-            Map::GenerateWorldStepFive(world, sprites, seed);
-            Map::GenerateWorldStepSeven(world, sprites, seed);
-            Map::GenerateWorldStepSix(world, sprites, seed);
-        }
+        // if (IsKeyPressed(KEY_F)) {
+            // Map::GenerateWorld(world, sprites);
+        // }
 
         int world_width = world->world_size_x * world->Data[0][0]->chunk_size_x * TILE_SIZE;
         if (SCREEN_WIDTH > world_width)
@@ -100,7 +69,7 @@ int main() {
         int clipping_x = (SCREEN_WIDTH / 2) / TILE_SIZE;
         int clipping_y = (SCREEN_HEIGHT / 2) / TILE_SIZE;
         int left_edge_chunk = (player_x_tiles - clipping_x) / world->Data[0][0]->chunk_size_x;
-        int rigth_edge_chunk = (player_x_tiles + clipping_y) / world->Data[0][0]->chunk_size_x + 2;
+        int rigth_edge_chunk = (player_x_tiles + clipping_y) / world->Data[0][0]->chunk_size_x + 3;
         int up_edge_chunk = (player_y_tiles - clipping_y) / world->Data[0][0]->chunk_size_y;
         int down_edge_chunk = (player_y_tiles + clipping_y) / world->Data[0][0]->chunk_size_y + 1;
         if (left_edge_chunk < 0) left_edge_chunk = 0;
