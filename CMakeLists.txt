@@ -25,6 +25,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 
 # --- Executables ---
+# Conf atom
+add_executable("confs" atoms/conf.c)
+# Game
 file(GLOB Sources src/*.cpp src/gfx/*.cpp src/world/*.cpp)
 add_compile_definitions("RELEASE=$<CONFIG:Release>")
 add_executable("${PROJECT_NAME}" ${Sources})

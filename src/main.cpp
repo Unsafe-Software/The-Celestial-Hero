@@ -3,6 +3,7 @@
 #include <raylib.h>
 
 #include "config.hpp"
+#include "settings.conf.h"
 #include "world/world.hpp"
 #include "world/worldgen.hpp"
 #include "gfx/gfx.hpp"
@@ -16,8 +17,8 @@ void DrawChunk(Map::Chunk* chunk, GFX::SpriteList* sprites, int pos_y, int pos_x
 }
 
 int main() {
-    std::cout << "Booting up " << Config::Name << " " << Config::Version << ";" << std::endl;
-    std::cout << Config::License << std::endl << std::endl;
+    std::cout << "Booting up " << NAME << " " << VERSION << ";" << std::endl;
+    std::cout << LICENSE << std::endl << std::endl;
 
     if (RELEASE == 1) {
         SetTraceLogLevel(LOG_WARNING);
@@ -44,9 +45,6 @@ int main() {
         if (IsKeyDown(KEY_UP)    || IsKeyDown(KEY_W)) cam_pos.y -= PLAYER_SPEED;
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) cam_pos.x += PLAYER_SPEED;
         if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) cam_pos.x -= PLAYER_SPEED;
-        // if (IsKeyPressed(KEY_F)) {
-            // Map::GenerateWorld(world, sprites);
-        // }
 
         int world_width = world->world_size_x * world->Data[0][0]->chunk_size_x * TILE_SIZE;
         if (SCREEN_WIDTH > world_width)

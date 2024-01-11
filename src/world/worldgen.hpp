@@ -2,16 +2,7 @@
 #include <cstdlib>
 #include "world.hpp"
 #include "../gfx/gfx.hpp"
-#include "../worldgen_setts.hpp"
-
-#define FACTOR_E 0.5
-#define SCALE_E 0.3
-#define FACTOR_PI -0.8
-#define SCALE_PI 0.2
-#define FACTOR1 2.8
-#define SCALE1 0.1
-#define FACTOR_GLOB 3.2
-#define E 2.71828
+#include "../worldgen.conf.h"
 
 namespace Map {
     void GenerateWorld(World* world, GFX::SpriteList* sprites) {
@@ -35,9 +26,9 @@ namespace Map {
                 int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2 + 10;
                 if (world->GetCell(y, x) == 2)
                     if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.465) {
-                        if (y > noise) world->SetCell(y, x, 3);
+                        if (y > noise) world->SetCell(y, x, 7);
                         else if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                            world->SetCell(y, x, 3);
+                            world->SetCell(y, x, 7);
                     }
             }
         }
@@ -52,16 +43,16 @@ namespace Map {
                     int air_tiles = 0;
                     for (int i = -1; i <= 1; ++i) {
                         for (int j = -1; j <= 1; ++j) {
-                            if (world_copy->GetCell(y + i, x + j) == 3) ++air_tiles;
+                            if (world_copy->GetCell(y + i, x + j) == 7) ++air_tiles;
                             else if (world_copy->GetCell(y + i, x + j) == 2) ++stone_tiles;
                         }
                     }
                     if (air_tiles > 4) {
                         if (y > noise) {
-                            world->SetCell(y, x, 3);
+                            world->SetCell(y, x, 7);
                         } else {
                             if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                                world->SetCell(y, x, 3);
+                                world->SetCell(y, x, 7);
                         }
                     }
                     if (stone_tiles > 4) {
@@ -153,17 +144,17 @@ namespace Map {
                         if (grow_tree) {
                             bool last_grown = false;
                             for (int i = 0; i >= -(std::rand() % 6 + 10); --i) {
-                                world->SetCell(y + i, x, 6);
+                                world->SetCell(y + i - 1, x, 6);
                                 if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.2) {
                                     if (!last_grown) {
-                                        world->SetCell(y + i, x - 1, 6);
+                                        world->SetCell(y + i - 1, x - 1, 6);
                                         last_grown = true;
                                     } else {
                                         last_grown = false;
                                     }
                                 } else if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) > 0.8) {
                                     if (!last_grown) {
-                                        world->SetCell(y + i, x + 1, 6);
+                                        world->SetCell(y + i - 1, x + 1, 6);
                                         last_grown = true;
                                     } else {
                                         last_grown = false;
