@@ -5,22 +5,27 @@
 namespace Physics {
     enum ColliderShape {
         Rect,
-    }
+        Circle,
+    };
 
     class Entity {
     public:
-        GFX::Sprite sprite;
-        int pos_y;
-        int pos_x;
-        int size_y;
-        int size_x;
-        ColliderShape shape;
+        GFX::Sprite* Sprite;
+        float Pos_y;
+        float Pos_x;
+        int Size_y;
+        int Size_x;
+        ColliderShape Shape;
+        bool gravity;
 
-        Entity(GFX::Sprite* sprite);
-        Entity(GFX::Sprite* sprite, int pos_y, int pos_x);
-        Entity(GFX::Sprite* sprite, int pos_y, int pos_x, int size_y, int size_x);
-        Entity(GFX::Sprite* sprite, int pos_y, int pos_x, int size_y, int size_x, ColliderShape shape);
+        Entity();
+        Entity(float pos_y, float pos_x);
+        Entity(float pos_y, float pos_x, int size_y, int size_x);
+        Entity(float pos_y, float pos_x, int size_y, int size_x, ColliderShape shape);
 
-        Draw();
+        void Draw(float y, float x);
+        void Draw(float y, float x, bool debug);
+        void Update(Map::World* world);
+        void SetSprite(GFX::Sprite sprite);
     };
 }

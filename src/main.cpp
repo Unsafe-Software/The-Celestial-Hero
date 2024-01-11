@@ -7,6 +7,7 @@
 #include "world/world.hpp"
 #include "world/worldgen.hpp"
 #include "gfx/gfx.hpp"
+#include "physics/entities.hpp"
 
 void DrawChunk(Map::Chunk* chunk, GFX::SpriteList* sprites, int pos_y, int pos_x) {
     for (int y = 0; y < chunk->chunk_size_y; ++y) {
@@ -37,8 +38,18 @@ int main() {
     bool space_pressed = false;
     Map::GenerateWorld(world, sprites);
 
+    Physics::Entity* entity = new Physics::Entity(
+        world->world_size_y * world->Data[0][0]->chunk_size_y / 2 - 16,
+        world->world_size_x * world->Data[0][0]->chunk_size_x / 2
+    );
+    entity->gravity = true;
+
     while (!WindowShouldClose()) {
         BeginDrawing();
+        // Updating
+        entity->Update(world);
+
+        // Drawing
         ClearBackground(BLACK);
 
         if (IsKeyDown(KEY_DOWN)  || IsKeyDown(KEY_S)) cam_pos.y += PLAYER_SPEED;
@@ -85,6 +96,7 @@ int main() {
         }
 
         DrawFPS(3, 0);
+        entity->Draw(-cam_pos.y / TILE_SIZE, -cam_pos.x / TILE_SIZE, true);
         EndDrawing();
     }
 
