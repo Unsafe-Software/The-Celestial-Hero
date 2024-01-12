@@ -12,6 +12,6 @@ namespace GFX {
         Sprite(std::string path);
         ~Sprite();
         
-        void Draw(int y, int x);
+        void Draw(int y, int x, int scale);
     };
 }

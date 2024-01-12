@@ -5,7 +5,7 @@
 #define WORLD_SIZE_Y 15
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 576
-#define TILE_SIZE 16
+#define TILE_SIZE 8
 #define PLAYER_SPEED 4.0f
 #define GRAVITY 1.0f
 

@@ -15,6 +15,8 @@ namespace Physics {
         float Pos_x;
         int Size_y;
         int Size_x;
+        float Speed_y;
+        float Speed_x;
         ColliderShape Shape;
         bool gravity;
 
@@ -25,7 +27,9 @@ namespace Physics {
 
         void Draw(float y, float x);
         void Draw(float y, float x, bool debug);
-        void Update(Map::World* world);
-        void SetSprite(GFX::Sprite sprite);
+        void Update(Map::World* world, Entity** entities);
+        void LoadSprite(std::string path);
+        bool CheckEntityCollision(Entity* col);
+        // bool CheckWorldCollision(Map::World* world, int y, int x);
     };
 }

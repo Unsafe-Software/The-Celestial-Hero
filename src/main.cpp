@@ -12,7 +12,7 @@
 void DrawChunk(Map::Chunk* chunk, GFX::SpriteList* sprites, int pos_y, int pos_x) {
     for (int y = 0; y < chunk->chunk_size_y; ++y) {
         for (int x = 0; x < chunk->chunk_size_x; ++x) {
-            sprites->Get(chunk->Data[y][x])->Draw(y * TILE_SIZE + pos_y, x * TILE_SIZE + pos_x);
+            sprites->Get(chunk->Data[y][x])->Draw(y * TILE_SIZE + pos_y, x * TILE_SIZE + pos_x, 1);
         }
     }
 }
@@ -39,23 +39,44 @@ int main() {
     Map::GenerateWorld(world, sprites);
 
     Physics::Entity* entity = new Physics::Entity(
-        world->world_size_y * world->Data[0][0]->chunk_size_y / 2 - 16,
-        world->world_size_x * world->Data[0][0]->chunk_size_x / 2
+        world->world_size_y * world->Data[0][0]->chunk_size_y / 2 - 4,
+        world->world_size_x * world->Data[0][0]->chunk_size_x / 2,
+        TILE_SIZE * 4,
+        TILE_SIZE * 4
     );
-    entity->gravity = true;
+    entity->gravity = false;
+    Physics::Entity* col_entity = new Physics::Entity(
+        world->world_size_y * world->Data[0][0]->chunk_size_y / 2 - 10,
+        world->world_size_x * world->Data[0][0]->chunk_size_x / 2,
+        TILE_SIZE * 4,
+        TILE_SIZE * 4
+    );
+    col_entity->gravity = false;
+    GFX::Sprite* stone_texture = new GFX::Sprite("./assets/stone.png");
+    GFX::Sprite* debug_texture = new GFX::Sprite("./assets/debug.png");
 
     while (!WindowShouldClose()) {
         BeginDrawing();
-        // Updating
-        entity->Update(world);
 
         // Drawing
         ClearBackground(BLACK);
 
-        if (IsKeyDown(KEY_DOWN)  || IsKeyDown(KEY_S)) cam_pos.y += PLAYER_SPEED;
-        if (IsKeyDown(KEY_UP)    || IsKeyDown(KEY_W)) cam_pos.y -= PLAYER_SPEED;
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) cam_pos.x += PLAYER_SPEED;
-        if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) cam_pos.x -= PLAYER_SPEED;
+        if (IsKeyDown(KEY_DOWN)  || IsKeyDown(KEY_S)) {
+            cam_pos.y += 2.0f;
+            col_entity->Speed_y = 0.25f;
+        }
+        if (IsKeyDown(KEY_UP)    || IsKeyDown(KEY_W)) {
+            cam_pos.y -= 2.0f;
+            col_entity->Speed_y = -0.25f;
+        }
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
+            cam_pos.x += 2.0f;
+            col_entity->Speed_x = 0.25f;
+        }
+        if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) {
+            cam_pos.x -= 2.0f;
+            col_entity->Speed_x = -0.25f;
+        }
 
         int world_width = world->world_size_x * world->Data[0][0]->chunk_size_x * TILE_SIZE;
         if (SCREEN_WIDTH > world_width)
@@ -97,6 +118,14 @@ int main() {
 
         DrawFPS(3, 0);
         entity->Draw(-cam_pos.y / TILE_SIZE, -cam_pos.x / TILE_SIZE, true);
+        col_entity->Draw(-cam_pos.y / TILE_SIZE, -cam_pos.x / TILE_SIZE, true);
+
+
+        // Updating
+        Physics::Entity* entity_updates[] = {col_entity};
+        entity->Update(world, entity_updates);
+        Physics::Entity* col_entity_updates[] = {entity};
+        col_entity->Update(world, col_entity_updates);
         EndDrawing();
     }
 
