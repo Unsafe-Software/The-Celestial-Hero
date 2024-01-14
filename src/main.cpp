@@ -1,112 +1,75 @@
 #include <iostream>
 #include <string>
 #include <raylib.h>
+#include "raymath.h"
+#include <yaml-cpp/yaml.h>
 
-#include "config.hpp"
-#include "settings.conf.h"
-#include "world/world.hpp"
-#include "world/worldgen.hpp"
-#include "gfx/gfx.hpp"
-#include "physics/entities.hpp"
+void camUpdate(Camera2D* camera, Vector2 pos, float delta) {
+    static float min_speed = 100;
+	static float min_effect_length = 20;
+	static float fraction_speed = 1.0f;
+	Vector2 v_offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+	camera->offset = v_offset;
+	Vector2 diff = Vector2Subtract(pos, camera->target);
+	float length = Vector2Length(diff);
 
-void DrawChunk(Map::Chunk* chunk, GFX::SpriteList* sprites, int pos_y, int pos_x) {
-    for (int y = 0; y < chunk->chunk_size_y; ++y) {
-        for (int x = 0; x < chunk->chunk_size_x; ++x) {
-            sprites->Get(chunk->Data[y][x])->Draw(y * TILE_SIZE + pos_y, x * TILE_SIZE + pos_x, 1);
-        }
-    }
+	if (length > min_effect_length) {
+		float speed = fmaxf(fraction_speed * length, min_speed);
+		camera->target = Vector2Add(camera->target, Vector2Scale(diff, speed * delta / length));
+	}
 }
 
 int main() {
-    std::cout << "Booting up " << NAME << " " << VERSION << ";" << std::endl;
-    std::cout << LICENSE << std::endl << std::endl;
+    YAML::Node config = YAML::LoadFile("./data/config.yaml");
+    std::cout << "Startup setts:" << std::endl;
 
-    if (RELEASE == 1) {
+    if (!config["debug"] || config["debug"].as<bool>() != true) {
         SetTraceLogLevel(LOG_WARNING);
     }
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "The Celestial Hero");
-    SetTargetFPS(60);
-
-    GFX::SpriteList* sprites = new GFX::SpriteList("./assets/sprites.txt");
-    Map::World* world = new Map::World();
-    Vector2 cam_pos = {
-        (float)(world->Data[0][0]->chunk_size_x * world->world_size_x * TILE_SIZE) / 2,
-        (float)(world->Data[0][0]->chunk_size_y * world->world_size_y * TILE_SIZE) / 2
-    };
-    int step = 0;
-    int seed = 0;
-    bool space_pressed = false;
-    Map::GenerateWorld(world, sprites);
-
-    Physics::Entity* player = new Physics::Entity(
-        world->world_size_y * world->Data[0][0]->chunk_size_y / 2 - 4,
-        world->world_size_x * world->Data[0][0]->chunk_size_x / 2 + 2,
-        TILE_SIZE,
-        TILE_SIZE
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(
+        (config["startup"]["window"]["width"]) ? config["startup"]["window"]["width"].as<int>() : 1280,
+        (config["startup"]["window"]["height"]) ? config["startup"]["window"]["height"].as<int>() : 720,
+        (config["startup"]["window"]["title_add"]) ? 
+            ("The Celestial Hero: " + config["startup"]["window"]["title_add"].as<std::string>()).c_str() :
+            "The Celestial Hero"
     );
-    // player->gravity = true;
-    player->LoadSprite("./assets/debug.png");
+    SetTargetFPS((config["startup"]["window"]["target_fps"]) ? config["startup"]["window"]["target_fps"].as<int>() : 60);
 
+    Camera2D camera = {};
+    camera.target = {0.0f, 0.0f};
+    camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+    Vector2 player_position = {200.0f, 200.0f};
+
+    bool debug_menu = (config["debug"]) ? config["debug"].as<bool>() : false;
+    bool smooth_cam = (config["smooth_cam"]) ? config["smooth_cam"].as<bool>() : false;
     while (!WindowShouldClose()) {
         BeginDrawing();
-        // Updating
-        // Drawing
+        if (IsKeyDown(KEY_W)) player_position.y -= 5.0f;
+        if (IsKeyDown(KEY_S)) player_position.y += 5.0f;
+        if (IsKeyDown(KEY_A)) player_position.x -= 5.0f;
+        if (IsKeyDown(KEY_D)) player_position.x += 5.0f;
+        if (IsKeyPressed(KEY_F3)) debug_menu = !debug_menu;
+        float delta = GetFrameTime();
+
+        if (smooth_cam) {
+            camUpdate(&camera, player_position, delta);
+        } else {
+            camera.target = player_position;
+        }
+
         ClearBackground(BLACK);
+        BeginMode2D(camera);
+        DrawRectangle(100, 100, 20, 20, RED);
+        DrawRectangle(player_position.x, player_position.y, 20, 20, BLUE);
+        EndMode2D();
 
-        if (IsKeyDown(KEY_DOWN)  || IsKeyDown(KEY_S)) {
-            player->Speed_y = PLAYER_SPEED;
+        if (debug_menu) {
+            DrawText("Debug info:", 0, 0, 20, DARKGREEN);
+            DrawFPS(0, 20);
         }
-        if (IsKeyDown(KEY_UP)    || IsKeyDown(KEY_W)) {
-            player->Speed_y = -PLAYER_SPEED;
-        }
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-            player->Speed_x = PLAYER_SPEED;
-        }
-        if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) {
-            player->Speed_x = -PLAYER_SPEED;
-        }
-
-        int world_width = world->world_size_x * world->Data[0][0]->chunk_size_x * TILE_SIZE;
-        if (SCREEN_WIDTH > world_width)
-            cam_pos.x = SCREEN_WIDTH / 2;
-        else if (cam_pos.x < SCREEN_WIDTH / 2) 
-            cam_pos.x = SCREEN_WIDTH / 2;
-        else if (cam_pos.x > world_width - SCREEN_WIDTH / 2)
-            cam_pos.x = world_width - SCREEN_WIDTH / 2;
-
-        int world_height = world->world_size_y * world->Data[0][0]->chunk_size_y * TILE_SIZE;
-        if (SCREEN_HEIGHT > world_height)
-            cam_pos.y = SCREEN_HEIGHT / 2;
-        else if (cam_pos.y < SCREEN_HEIGHT / 2)
-            cam_pos.y = SCREEN_HEIGHT / 2;
-        else if (cam_pos.y > world_height - SCREEN_HEIGHT / 2)
-            cam_pos.y = world_height - SCREEN_HEIGHT / 2;
-
-        int player_y_tiles = cam_pos.y / TILE_SIZE;
-        int player_x_tiles = cam_pos.x / TILE_SIZE;
-        int clipping_x = (SCREEN_WIDTH / 2) / TILE_SIZE;
-        int clipping_y = (SCREEN_HEIGHT / 2) / TILE_SIZE;
-        int left_edge_chunk = (player_x_tiles - clipping_x) / world->Data[0][0]->chunk_size_x;
-        int rigth_edge_chunk = (player_x_tiles + clipping_y) / world->Data[0][0]->chunk_size_x + 3;
-        int up_edge_chunk = (player_y_tiles - clipping_y) / world->Data[0][0]->chunk_size_y;
-        int down_edge_chunk = (player_y_tiles + clipping_y) / world->Data[0][0]->chunk_size_y + 1;
-        if (left_edge_chunk < 0) left_edge_chunk = 0;
-        if (rigth_edge_chunk >= world->world_size_x) rigth_edge_chunk = world->world_size_x;
-        if (up_edge_chunk < 0) up_edge_chunk = 0;
-        if (down_edge_chunk >= world->world_size_y) down_edge_chunk = world->world_size_y;
-        for (int y = up_edge_chunk; y < down_edge_chunk; ++y) {
-            for (int x = left_edge_chunk; x < rigth_edge_chunk; ++x) {
-                DrawChunk(
-                    world->Data[y][x], sprites,
-                    y * world->Data[0][0]->chunk_size_y * TILE_SIZE + -cam_pos.y + (int)(SCREEN_HEIGHT / 2),
-                    x * world->Data[0][0]->chunk_size_x * TILE_SIZE + -cam_pos.x + (int)(SCREEN_WIDTH / 2)
-                );
-            }
-        }
-
-        DrawFPS(3, 0);
-        player->Update(world);
-        player->Draw(-cam_pos.y / TILE_SIZE, -cam_pos.x / TILE_SIZE, true);
         EndDrawing();
     }
 

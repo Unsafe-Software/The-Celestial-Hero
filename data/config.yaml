@@ -1,0 +1,14 @@
+# Adds logs, and other features for debugging
+# Also shows the debug panel (F3) on the startup
+debug: true
+
+# Settings applied only on the start of the game
+startup:
+  window:
+    width: 1280
+    height: 720
+    title_add: "v0.0.0"
+    target_fps: 30
+
+# If true, smoothes the camera movement.
+smooth_cam: false
