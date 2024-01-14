@@ -61,41 +61,75 @@ namespace Physics {
         }
     }
 
-    void Entity::Update(Map::World* world, Entity** entities) {
+    void Entity::Update(Map::World* world) {
         float mod_y = 0;
         float mod_x = 0;
 
         if (gravity) {
-            // Speed_y += GRAVITY;
+            Speed_y += GRAVITY;
         }
 
         mod_y += Speed_y;
         Speed_y = 0;
         bool Col_y = false;
-        for (int i = 0; i < 1; ++i) {
-            DrawRectangleRec((Rectangle){Pos_x, mod_y + Pos_y, (float)Size_x / TILE_SIZE, (float)Size_x / TILE_SIZE}, WHITE);
-            DrawRectangleRec((Rectangle){entities[i]->Pos_x, entities[i]->Pos_y, (float)entities[i]->Size_x / TILE_SIZE, (float)entities[i]->Size_y / TILE_SIZE}, WHITE);
-            if (CheckCollisionRecs(
-                (Rectangle){Pos_x, mod_y + Pos_y, (float)Size_x / TILE_SIZE, (float)Size_x / TILE_SIZE},
-                (Rectangle){entities[i]->Pos_x, entities[i]->Pos_y, (float)entities[i]->Size_x / TILE_SIZE, (float)entities[i]->Size_x / TILE_SIZE}
-            )) Col_y = true;
+        if (mod_y < 0) {
+            if (world->GetCell(round(Pos_y) - 1, Pos_x) == 5 &&
+                CheckCollisionRecs(
+                    (Rectangle){(float)Pos_y, (float)Pos_x + mod_x, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
+                    (Rectangle){(float)Pos_y - 1, (float)Pos_x, (float)TILE_SIZE, (float)TILE_SIZE}
+                )) Col_y = true;
+        } else if (mod_y > 0) {
+            if (world->GetCell(round(Pos_y) + 1, Pos_x) == 5 &&
+                CheckCollisionRecs(
+                    (Rectangle){(float)Pos_y, (float)Pos_x + mod_x, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
+                    (Rectangle){(float)Pos_y + 1, (float)Pos_x, (float)TILE_SIZE, (float)TILE_SIZE}
+                )) Col_y = true;
         }
-        if (!Col_y)
+        // for (int y = -1 + Pos_y; y <= 1 + Pos_y; ++y) {
+        //     for (int x = -1 + Pos_x; x <= 1 + Pos_x; ++x) {
+        //         if (world->GetCell(y, x) == 6) {
+        //             if (CheckCollisionRecs(
+        //                 (Rectangle){(float)Pos_y + mod_y, (float)Pos_x, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
+        //                 (Rectangle){(float)y, (float)x, (float)TILE_SIZE, (float)TILE_SIZE}
+        //             )) Col_y = true;
+        //         }
+        //     }
+        // }
+        if (!Col_y) {
+            std::cout << "Move!" << std::endl;
             Pos_y += mod_y;
+        }
 
         mod_x += Speed_x;
         Speed_x = 0;
         bool Col_x = false;
-        for (int i = 0; i < 1; ++i) {
-            DrawRectangleRec((Rectangle){mod_x + Pos_x, Pos_x, (float)Size_x / TILE_SIZE, (float)Size_x / TILE_SIZE}, WHITE);
-            DrawRectangleRec((Rectangle){entities[i]->Pos_x, entities[i]->Pos_x, (float)entities[i]->Size_x / TILE_SIZE, (float)entities[i]->Size_x / TILE_SIZE}, WHITE);
-            if (CheckCollisionRecs(
-                (Rectangle){mod_x + Pos_x, Pos_y, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
-                (Rectangle){entities[i]->Pos_x, entities[i]->Pos_y, (float)entities[i]->Size_x / TILE_SIZE, (float)entities[i]->Size_y / TILE_SIZE}
-            )) Col_x = true;
+        if (mod_x < 0) {
+            if (world->GetCell(Pos_y, round(Pos_x) - 1) == 5 &&
+                CheckCollisionRecs(
+                    (Rectangle){(float)Pos_y, (float)Pos_x + mod_x, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
+                    (Rectangle){(float)Pos_y, (float)Pos_x - 1, (float)TILE_SIZE, (float)TILE_SIZE}
+                )) Col_x = true;
+        } else if (mod_x > 0) {
+            if (world->GetCell(Pos_y, round(Pos_x) + 1) == 5 &&
+                CheckCollisionRecs(
+                    (Rectangle){(float)Pos_y, (float)Pos_x + mod_x, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
+                    (Rectangle){(float)Pos_y, (float)Pos_x + 1, (float)TILE_SIZE, (float)TILE_SIZE}
+                )) Col_x = true;
         }
-        if (!Col_x)
+        // for (int y = -1 + Pos_y; y <= 1 + Pos_y; ++y) {
+        //     for (int x = -1 + Pos_x; x <= 1 + Pos_x; ++x) {
+        //         if (world->GetCell(y, x) == 6) {
+        //             if (CheckCollisionRecs(
+        //                 (Rectangle){(float)Pos_y, (float)Pos_x + mod_x, (float)Size_x / TILE_SIZE, (float)Size_y / TILE_SIZE},
+        //                 (Rectangle){(float)y, (float)x, (float)TILE_SIZE, (float)TILE_SIZE}
+        //             )) Col_x = true;
+        //         }
+        //     }
+        // }
+        if (!Col_x) {
+            std::cout << "Move!" << std::endl;
             Pos_x += mod_x;
+        }
     }
 
     void Entity::LoadSprite(std::string path) {

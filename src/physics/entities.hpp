@@ -27,7 +27,7 @@ namespace Physics {
 
         void Draw(float y, float x);
         void Draw(float y, float x, bool debug);
-        void Update(Map::World* world, Entity** entities);
+        void Update(Map::World* world);
         void LoadSprite(std::string path);
         bool CheckEntityCollision(Entity* col);
         // bool CheckWorldCollision(Map::World* world, int y, int x);
