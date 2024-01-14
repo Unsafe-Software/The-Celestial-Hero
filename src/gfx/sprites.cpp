@@ -12,8 +12,8 @@ namespace GFX {
         UnloadTexture(texture);
     }
 
-    void Sprite::Draw(int y, int x) {
+    void Sprite::Draw(int y, int x, int scale) {
         Vector2 position = {static_cast<float>(x), static_cast<float>(y)};
-        DrawTexture(texture, position.x, position.y, (Color){WHITE});
+        DrawTextureEx(texture, (Vector2){position.x, position.y}, 0.0f, (float)scale, (Color){WHITE});
     }
 }

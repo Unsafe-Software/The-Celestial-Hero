@@ -28,7 +28,7 @@ FetchContent_MakeAvailable(raylib)
 # Conf atom
 add_executable("confs" atoms/conf.c)
 # Game
-file(GLOB Sources src/*.cpp src/gfx/*.cpp src/world/*.cpp)
+file(GLOB Sources src/*.cpp src/gfx/*.cpp src/world/*.cpp src/physics/*.cpp)
 add_compile_definitions("RELEASE=$<CONFIG:Release>")
 add_executable("${PROJECT_NAME}" ${Sources})
 target_link_libraries("${PROJECT_NAME}" raylib)
