@@ -7,10 +7,10 @@ class Entity {
     Rectangle bound;
     Texture2D texture;
 
-    void ResolveCollisions();
+    void resolveCollisions();
 
 public:
-    Entity(Rectangle Bound, Texture2D Texture, Map::World* world);
+    Entity(Rectangle Bound, Texture2D Texture, Map::World* World);
 
     void Move(float x, float y);
     
@@ -20,4 +20,7 @@ public:
     void SetBound(Rectangle Buond);
     void SetPos(Vector2 Pos);
     void SetSize(Vector2 Size);
+    void SetWorld(Map::World* NewWorld, float x, float y);
+
+    void Draw();
 };

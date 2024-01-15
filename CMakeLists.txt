@@ -32,7 +32,7 @@ endif()
 
 # --- Executables ---
 # Game
-file(GLOB Sources src/*.cpp src/gfx/*.cpp src/world/*.cpp)
+file(GLOB Sources src/*.cpp src/gfx/*.cpp src/world/*.cpp src/entities/*.cpp)
 add_compile_definitions("RELEASE=$<CONFIG:Release>")
 add_executable("${PROJECT_NAME}" ${Sources})
 target_link_libraries("${PROJECT_NAME}" raylib yaml-cpp::yaml-cpp)
