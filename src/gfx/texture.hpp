@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <raylib.h>
 #include <yaml-cpp/yaml.h>
 
@@ -16,4 +17,18 @@ public:
     void Draw(Texture2D texture, float Destination_x, float Destination_y, float Scale, float Rotation);
 };
 
-std::vector<TextureFromAtlas*> LoadTexturesFromYaml(YAML::Node yaml, YAML::Node config);
+class Textures {
+    Texture2D texture;
+    std::vector<TextureFromAtlas> textures;
+    YAML::Node config;
+
+public:
+    Textures(std::string Config_path);
+    Textures(YAML::Node Config);
+
+    void LoadAll();
+    TextureFromAtlas GetTextureI(int index);
+    std::vector<TextureFromAtlas> GetTextures();
+    Texture2D GetTexture();
+};
+
