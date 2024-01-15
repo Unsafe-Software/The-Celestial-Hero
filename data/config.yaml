@@ -11,14 +11,14 @@ startup:
     target_fps: 60
 
 # If true, smoothes the camera movement.
-smooth_cam: false
+smooth_cam: true
 
 # Size of a block in the world
 tile_size: 16
 
 # Information about the player
 player:
-  move_speed: 1
+  move_speed: 0.025
 
 # Innformation about the world
 world:
