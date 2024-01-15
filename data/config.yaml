@@ -12,3 +12,8 @@ startup:
 
 # If true, smoothes the camera movement.
 smooth_cam: false
+
+tile_size: 16
+
+player:
+  move_speed: 10

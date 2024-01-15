@@ -1,6 +1,4 @@
 #pragma once
-#include "../config.hpp"
-#include "../settings.conf.h"
 
 namespace Map {
     class Chunk {
@@ -24,8 +22,8 @@ namespace Map {
 
     class World {
     public:
-        const static int world_size_x = WORLD_SIZE_X;
-        const static int world_size_y = WORLD_SIZE_Y;
+        const static int world_size_x = 10;
+        const static int world_size_y = 5;
         Chunk* Data[world_size_y][world_size_x];
 
         World();

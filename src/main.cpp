@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include <raylib.h>
 #include "raymath.h"
 #include <yaml-cpp/yaml.h>
+#include "gfx/gfx.hpp"
+#include "world/world.hpp"
+#include "world/worldgen.hpp"
 
 void camUpdate(Camera2D* camera, Vector2 pos, float delta) {
     static float min_speed = 100;
@@ -36,21 +40,31 @@ int main() {
     );
     SetTargetFPS((config["startup"]["window"]["target_fps"]) ? config["startup"]["window"]["target_fps"].as<int>() : 60);
 
+    std::vector<TextureFromAtlas*> blocks = LoadTexturesFromYaml(YAML::LoadFile("./data/assets/blocks.yaml"), config);
+    Texture2D blocks_texture = LoadTexture("./data/assets/blocks.png");
+    Map::World* world = new Map::World();
+    Map::GenerateWorld(world);
+    int tile_size = (config["tile_size"]) ? config["tile_size"].as<int>() : 16;
+
+    Vector2 player_position = {
+        (float)world->world_size_x * world->Data[0][0]->chunk_size_x * tile_size / 2,
+        (float)world->world_size_y * world->Data[0][0]->chunk_size_y * tile_size / 2
+    };
     Camera2D camera = {};
     camera.target = {0.0f, 0.0f};
     camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
-    Vector2 player_position = {200.0f, 200.0f};
 
     bool debug_menu = (config["debug"]) ? config["debug"].as<bool>() : false;
     bool smooth_cam = (config["smooth_cam"]) ? config["smooth_cam"].as<bool>() : false;
+    float player_speed = (config["player"]["move_speed"]) ? config["player"]["move_speed"].as<int>() : 60;
     while (!WindowShouldClose()) {
         BeginDrawing();
-        if (IsKeyDown(KEY_W)) player_position.y -= 5.0f;
-        if (IsKeyDown(KEY_S)) player_position.y += 5.0f;
-        if (IsKeyDown(KEY_A)) player_position.x -= 5.0f;
-        if (IsKeyDown(KEY_D)) player_position.x += 5.0f;
+        if (IsKeyDown(KEY_W)) player_position.y -= player_speed;
+        if (IsKeyDown(KEY_S)) player_position.y += player_speed;
+        if (IsKeyDown(KEY_A)) player_position.x -= player_speed;
+        if (IsKeyDown(KEY_D)) player_position.x += player_speed;
         if (IsKeyPressed(KEY_F3)) debug_menu = !debug_menu;
         float delta = GetFrameTime();
 
@@ -62,13 +76,28 @@ int main() {
 
         ClearBackground(BLACK);
         BeginMode2D(camera);
-        DrawRectangle(100, 100, 20, 20, RED);
-        DrawRectangle(player_position.x, player_position.y, 20, 20, BLUE);
+        for (int y = 0; y < world->world_size_y * world->Data[0][0]->chunk_size_y; ++y) {
+            for (int x = 0; x < world->world_size_x * world->Data[0][0]->chunk_size_x; ++x) {
+                blocks[world->GetCell(y, x)]->Draw(blocks_texture, (Vector2){(float)x * tile_size, (float)y * tile_size}, 1.0f, 0.0);
+            }
+        }
+        blocks[4]->Draw(blocks_texture, (Vector2){player_position.x, player_position.y}, 1.0f, 0.0f);
         EndMode2D();
 
         if (debug_menu) {
-            DrawText("Debug info:", 0, 0, 20, DARKGREEN);
-            DrawFPS(0, 20);
+            DrawFPS(0, 0);
+
+            DrawText((
+                "Player position: " +
+                std::to_string(player_position.x) + "X " +
+                std::to_string(player_position.y) + "Y"
+            ).c_str(), 0, 20, 20, DARKGREEN);
+            
+            if (smooth_cam) {
+                DrawText("Camera smooth mode: TRUE", 0, 40, 20, DARKGREEN);
+            } else {
+                DrawText("Camera smooth mode: FALSE", 0, 40, 20, DARKGREEN);
+            }
         }
         EndDrawing();
     }
