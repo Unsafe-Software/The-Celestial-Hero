@@ -31,4 +31,3 @@ public:
     std::vector<TextureFromAtlas> GetTextures();
     Texture2D GetTexture();
 };
-

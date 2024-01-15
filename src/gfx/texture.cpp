@@ -95,33 +95,3 @@ std::vector<TextureFromAtlas> Textures::GetTextures() {
 Texture2D Textures::GetTexture() {
     return texture;
 }
-
-// std::vector<TextureFromAtlas*> LoadTexturesFromYaml(YAML::Node yaml, YAML::Node config) {
-//     std::string texture_atlas_path;
-//     if (yaml["texture_atlas"]) {
-//         texture_atlas_path = yaml["texture_atlas"].as<std::string>();
-//     } else {
-//         std::cerr << "LoadTexturesFromYaml: Unable to find `texture_atlas` property from yaml provided.";
-//         exit(1);
-//     }
-
-//     YAML::Node textures;
-//     if (yaml["textures"]) {
-//         textures = yaml["textures"];
-//     } else {
-//         std::cerr << "LoadTexturesFromYaml: Unable to find `textures` property from yaml provided.";
-//         exit(1);
-//     }
-
-//     std::vector<TextureFromAtlas*> textures_result;
-//     for (std::size_t i = 0; i < textures.size(); ++i) {
-//         textures_result.push_back(new TextureFromAtlas(
-//             (yaml["textures"][i]["pos_x"]) ? yaml["textures"][i]["pos_x"].as<int>() : 0,
-//             (yaml["textures"][i]["pos_y"]) ? yaml["textures"][i]["pos_y"].as<int>() : 0,
-//             (config["tile_size"]) ? config["tile_size"].as<int>() : 16,
-//             (config["tile_size"]) ? config["tile_size"].as<int>() : 16
-//         ));
-//     }
-
-//     return textures_result;
-// }
