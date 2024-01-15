@@ -1,6 +1,5 @@
 #pragma once
-#include "../config.hpp"
-#include "../settings.conf.h"
+#include <vector>
 
 namespace Map {
     class Chunk {
@@ -24,11 +23,11 @@ namespace Map {
 
     class World {
     public:
-        const static int world_size_x = WORLD_SIZE_X;
-        const static int world_size_y = WORLD_SIZE_Y;
-        Chunk* Data[world_size_y][world_size_x];
+        int world_size_x;
+        int world_size_y;
+        std::vector<std::vector<Chunk*>> Data;
 
-        World();
+        World(int width, int height);
 
         void SetChunk(int y, int x, Chunk* chunk);
         void SetCell(int y, int x, int data);

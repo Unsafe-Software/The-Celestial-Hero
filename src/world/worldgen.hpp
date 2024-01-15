@@ -2,10 +2,18 @@
 #include <cstdlib>
 #include "world.hpp"
 #include "../gfx/gfx.hpp"
-#include "../worldgen.conf.h"
+
+#define FACTOR_E 0.5
+#define SCALE_E 0.3
+#define FACTOR_PI -0.8
+#define SCALE_PI 0.2
+#define FACTOR1 2.8
+#define SCALE1 0.1
+#define FACTOR_GLOB 3.2
+#define E 2.71828
 
 namespace Map {
-    void GenerateWorld(World* world, GFX::SpriteList* sprites) {
+    void GenerateWorld(World* world) {
         int world_size_y_blocks = world->world_size_y * world->Data[0][0]->chunk_size_y;
         int world_size_x_blocks = world->world_size_x * world->Data[0][0]->chunk_size_x;
 

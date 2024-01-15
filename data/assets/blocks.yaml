@@ -1,0 +1,28 @@
+texture_atlas: "./data/assets/blocks.png"
+
+textures:
+  - air:
+    pos_x: 0
+    pos_y: 0
+  - dirt:
+    pos_x: 16
+    pos_y: 0
+  - stone:
+    pos_x: 32
+    pos_y: 0
+  - air_cave:
+    pos_x: 64
+    pos_y: 0
+  - debug:
+    pos_x: 64
+    pos_y: 0
+  - grass:
+    pos_x: 80
+    pos_y: 0
+  - wood:
+    pos_x: 96
+    pos_y: 0
+  - bg:
+    pos_x: 112
+    pos_y: 0
+  
