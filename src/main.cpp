@@ -52,7 +52,7 @@ int main() {
 
     Vector2 player_position = {
         (float)world->world_size_x * world->Data[0][0]->chunk_size_x / 2,
-        (float)world->world_size_y * world->Data[0][0]->chunk_size_y / 2
+        (float)world->world_size_y * world->Data[0][0]->chunk_size_y / 2 - 12
     };
     Camera2D camera = {};
     camera.target = {0.0f, 0.0f};
@@ -73,8 +73,6 @@ int main() {
         if (IsKeyDown(KEY_A)) test_entity->AddToSpeed((Vector2){-player_speed * delta, 0.0f});
         if (IsKeyDown(KEY_D)) test_entity->AddToSpeed((Vector2){player_speed * delta, 0.0f});
         if (IsKeyPressed(KEY_F3)) debug_menu = !debug_menu;
-        player_position = test_entity->GetPos();
-        test_entity->Update();
 
         if (smooth_cam) {
             camUpdate(&camera, (Vector2){player_position.x * tile_size, player_position.y * tile_size}, delta);
@@ -115,7 +113,10 @@ int main() {
         }
 
         // Entities
+        test_entity->Update();
+        player_position = test_entity->GetPos();
         test_entity->Draw(tile_size);
+        DrawRectangle(120 * tile_size, 60 * tile_size, 16, 16, RED);
         EndMode2D();
         EndScissorMode();
 
