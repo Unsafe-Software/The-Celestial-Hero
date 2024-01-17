@@ -113,10 +113,10 @@ int main() {
         }
 
         // Entities
+        DrawRectangle(120 * tile_size, 60 * tile_size, 32, 32, RED);
         test_entity->Update();
         player_position = test_entity->GetPos();
         test_entity->Draw(tile_size);
-        DrawRectangle(120 * tile_size, 60 * tile_size, 16, 16, RED);
         EndMode2D();
         EndScissorMode();
 
