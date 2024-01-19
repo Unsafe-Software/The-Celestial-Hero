@@ -60,7 +60,7 @@ int main() {
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    Entities::Entity* test_entity = new Entities::Entity(player_position, "./data/assets/test_entity.png", world);
+    Entities::Entity* test_entity = new Entities::Entity((Rectangle){player_position.x, player_position.y, 16.0f, 32.0f}, "./data/assets/test_entity.png", world);
 
     bool debug_menu = (config["debug"]) ? config["debug"].as<bool>() : false;
     bool smooth_cam = (config["smooth_cam"]) ? config["smooth_cam"].as<bool>() : false;
@@ -113,7 +113,6 @@ int main() {
         }
 
         // Entities
-        DrawRectangle(120 * tile_size, 60 * tile_size, 32, 32, RED);
         test_entity->Update();
         player_position = test_entity->GetPos();
         test_entity->Draw(tile_size);

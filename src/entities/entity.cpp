@@ -8,94 +8,112 @@
 #define MAX_SPEED 0.25
 
 namespace Entities {
+    void addTile(std::vector<Rectangle> &rects, Map::World* world, float x, float y, int type) {
+        if (world->GetCell(y, x) == type) {
+            rects.push_back((Rectangle){x - 0.01f, y - 0.01f, 1.0f + 0.02f, 1.0f + 0.02f});
+            // DrawRectangle((x) * 16, (y) * 16, 16.0f, 16.0f, YELLOW);
+        }
+    }
+
     void Entity::resolveCollisions() {
-        Rectangle rect = (Rectangle){120, 60, 2, 2};
-
-        if (CheckCollisionRecs(bound, rect)) {
-            bool corner_up_left, corner_up_right, corner_down_left, corner_down_right;
-            if (CheckCollisionPointRec((Vector2){bound.x, bound.y}, rect))
-                corner_up_left = true;
-            if (CheckCollisionPointRec((Vector2){bound.x + (bound.width / 16), bound.y}, rect))
-                corner_up_right = true;
-            if (CheckCollisionPointRec((Vector2){bound.x, bound.y + (bound.height / 16)}, rect))
-                corner_down_left = true;
-            if (CheckCollisionPointRec((Vector2){bound.x + (bound.width / 16), bound.y + (bound.height / 16)}, rect))
-                corner_down_right = true;
-            
-            // if (corner_up_left)
-            //     DrawCircle(bound.x * 16, bound.y * 16, 4, YELLOW);
-            // if (corner_up_right)
-            //     DrawCircle(bound.x * 16 + bound.width, bound.y * 16, 4, YELLOW);
-            // if (corner_down_left)
-            //     DrawCircle(bound.x * 16, bound.y * 16 + bound.height, 4, YELLOW);
-            // if (corner_down_right)
-            //     DrawCircle(bound.x * 16 + bound.width, bound.y * 16 + bound.height, 4, YELLOW);
-            
-            if (corner_up_left && corner_down_left && !corner_up_right && !corner_down_right) {
-                bound.x += (rect.x + rect.width) - bound.x;
-                if (speed.x < 0.0f)
-                    speed.x = 0.0f;
-            } else if (corner_up_right && corner_down_right && !corner_up_left && !corner_down_left) {
-                bound.x -= (bound.x + bound.width / 16) - rect.x;
-                if (speed.x > 0.0f)
-                    speed.x = 0.0f;
-            } else if (corner_up_left && corner_up_right && !corner_down_left && !corner_down_right) {
-                bound.y += (rect.y + rect.height) - bound.y;
-                if (speed.y < 0.0f)
-                    speed.y = 0.0f;
-            } else if (corner_down_left && corner_down_right && !corner_up_left && !corner_up_right) {
-                bound.y -= (bound.y + bound.height / 16) - rect.y;
-                if (speed.y > 0.0f)
-                    speed.y = 0.0f;
-            }
-
-            if (corner_up_left && !corner_up_right && !corner_down_left && !corner_down_right) {
-                float correction_y = (rect.y + rect.height) - bound.y;
-                float correction_x = (rect.x + rect.width) - bound.x;
-                if (abs(correction_y) <= abs(correction_x)) {
-                    bound.y += correction_y;
-                    if (speed.y < 0.0f)
-                        speed.y = 0.0f;
-                } else {
-                    bound.x += correction_x;
+        std::vector<Rectangle> rects;
+        addTile(rects, world, floorf(bound.x - 1), floorf(bound.y - 1), 5);
+        addTile(rects, world, floorf(bound.x - 1), floorf(bound.y), 5);
+        addTile(rects, world, floorf(bound.x - 1), floorf(bound.y + bound.height / 16), 5);
+        addTile(rects, world, floorf(bound.x),     floorf(bound.y - 1), 5);
+        addTile(rects, world, floorf(bound.x),     floorf(bound.y), 5);
+        addTile(rects, world, floorf(bound.x),     floorf(bound.y + bound.height / 16), 5);
+        addTile(rects, world, floorf(bound.x + bound.width / 16), floorf(bound.y - 1), 5);
+        addTile(rects, world, floorf(bound.x + bound.width / 16), floorf(bound.y), 5);
+        addTile(rects, world, floorf(bound.x + bound.width / 16), floorf(bound.y + bound.height / 16), 5);
+        
+        for (const auto rect : rects) {
+            if (CheckCollisionRecs(bound, rect)) {
+                bool corner_up_left, corner_up_right, corner_down_left, corner_down_right;
+                if (CheckCollisionPointRec((Vector2){bound.x, bound.y}, rect))
+                    corner_up_left = true;
+                if (CheckCollisionPointRec((Vector2){bound.x + (bound.width / 16), bound.y}, rect))
+                    corner_up_right = true;
+                if (CheckCollisionPointRec((Vector2){bound.x, bound.y + (bound.height / 16)}, rect))
+                    corner_down_left = true;
+                if (CheckCollisionPointRec((Vector2){bound.x + (bound.width / 16), bound.y + (bound.height / 16)}, rect))
+                    corner_down_right = true;
+                
+                // if (corner_up_left)
+                //     DrawCircle(bound.x * 16, bound.y * 16, 4, YELLOW);
+                // if (corner_up_right)
+                //     DrawCircle(bound.x * 16 + bound.width, bound.y * 16, 4, YELLOW);
+                // if (corner_down_left)
+                //     DrawCircle(bound.x * 16, bound.y * 16 + bound.height, 4, YELLOW);
+                // if (corner_down_right)
+                //     DrawCircle(bound.x * 16 + bound.width, bound.y * 16 + bound.height, 4, YELLOW);
+                
+                if (corner_up_left && corner_down_left && !corner_up_right && !corner_down_right) {
+                    bound.x += (rect.x + rect.width) - bound.x;
                     if (speed.x < 0.0f)
                         speed.x = 0.0f;
-                }
-            } else if (!corner_up_left && corner_up_right && !corner_down_left && !corner_down_right) {
-                float correction_y = (rect.y + rect.height) - bound.y;
-                float correction_x = -((bound.x + bound.width / 16) - rect.x);
-                if (abs(correction_y) <= abs(correction_x)) {
-                    bound.y += correction_y;
+                } else if (corner_up_right && corner_down_right && !corner_up_left && !corner_down_left) {
+                    bound.x -= (bound.x + bound.width / 16) - rect.x;
+                    if (speed.x > 0.0f)
+                        speed.x = 0.0f;
+                } else if (corner_up_left && corner_up_right && !corner_down_left && !corner_down_right) {
+                    bound.y += (rect.y + rect.height) - bound.y;
                     if (speed.y < 0.0f)
                         speed.y = 0.0f;
-                } else {
-                    bound.x += correction_x;
-                    if (speed.x > 0.0f)
-                        speed.x = 0.0f;
-                }
-            } else if (!corner_up_left && !corner_up_right && corner_down_left && !corner_down_right) {
-                float correction_y = -((bound.y + bound.height / 16) - rect.y);
-                float correction_x = (rect.x + rect.width) - bound.x;
-                if (abs(correction_y) <= abs(correction_x)) {
-                    bound.y += correction_y;
+                } else if (corner_down_left && corner_down_right && !corner_up_left && !corner_up_right) {
+                    bound.y -= (bound.y + bound.height / 16) - rect.y;
                     if (speed.y > 0.0f)
                         speed.y = 0.0f;
-                } else {
-                    bound.x += correction_x;
-                    if (speed.x < 0.0f)
-                        speed.x = 0.0f;
                 }
-            } else if (!corner_up_left && !corner_up_right && !corner_down_left && corner_down_right) {
-                float correction_y = -((bound.y + bound.height / 16) - rect.y);
-                float correction_x = -((bound.x + bound.width / 16) - rect.x);
-                if (abs(correction_y) <= abs(correction_x)) {
-                    bound.y += correction_y;
-                    if (speed.y > 0.0f)
-                        speed.y = 0.0f;
-                } else {
-                    bound.x += correction_x;
-                    if (speed.x > 0.0f)
-                        speed.x = 0.0f;
+
+                if (corner_up_left && !corner_up_right && !corner_down_left && !corner_down_right) {
+                    float correction_y = (rect.y + rect.height) - bound.y;
+                    float correction_x = (rect.x + rect.width) - bound.x;
+                    if (abs(correction_y) <= abs(correction_x)) {
+                        bound.y += correction_y;
+                        if (speed.y < 0.0f)
+                            speed.y = 0.0f;
+                    } else {
+                        bound.x += correction_x;
+                        if (speed.x < 0.0f)
+                            speed.x = 0.0f;
+                    }
+                } else if (!corner_up_left && corner_up_right && !corner_down_left && !corner_down_right) {
+                    float correction_y = (rect.y + rect.height) - bound.y;
+                    float correction_x = -((bound.x + bound.width / 16) - rect.x);
+                    if (abs(correction_y) <= abs(correction_x)) {
+                        bound.y += correction_y;
+                        if (speed.y < 0.0f)
+                            speed.y = 0.0f;
+                    } else {
+                        bound.x += correction_x;
+                        if (speed.x > 0.0f)
+                            speed.x = 0.0f;
+                    }
+                } else if (!corner_up_left && !corner_up_right && corner_down_left && !corner_down_right) {
+                    float correction_y = -((bound.y + bound.height / 16) - rect.y);
+                    float correction_x = (rect.x + rect.width) - bound.x;
+                    if (abs(correction_y) <= abs(correction_x)) {
+                        bound.y += correction_y;
+                        if (speed.y > 0.0f)
+                            speed.y = 0.0f;
+                    } else {
+                        bound.x += correction_x;
+                        if (speed.x < 0.0f)
+                            speed.x = 0.0f;
+                    }
+                } else if (!corner_up_left && !corner_up_right && !corner_down_left && corner_down_right) {
+                    float correction_y = -((bound.y + bound.height / 16) - rect.y);
+                    float correction_x = -((bound.x + bound.width / 16) - rect.x);
+                    if (abs(correction_y) <= abs(correction_x)) {
+                        bound.y += correction_y;
+                        if (speed.y > 0.0f)
+                            speed.y = 0.0f;
+                    } else {
+                        bound.x += correction_x;
+                        if (speed.x > 0.0f)
+                            speed.x = 0.0f;
+                    }
                 }
             }
         }
