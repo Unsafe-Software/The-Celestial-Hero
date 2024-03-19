@@ -22,7 +22,7 @@ namespace Map {
             int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2;
             for (int y = 0; y < world_size_y_blocks; ++y) {
                 if (y > noise) {
-                    world->SetCell(y, x, 2);
+                    world->SetCell(y, x, Stone);
                 }
             }
         }
@@ -32,11 +32,11 @@ namespace Map {
             for (int x = 0; x < world_size_x_blocks; ++x) {
                 float loc_x = x / 3;
                 int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2 + 10;
-                if (world->GetCell(y, x) == 2)
+                if (world->GetCell(y, x) == Stone)
                     if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.465) {
-                        if (y > noise) world->SetCell(y, x, 7);
+                        if (y > noise) world->SetCell(y, x, Bg);
                         else if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                            world->SetCell(y, x, 7);
+                            world->SetCell(y, x, Bg);
                     }
             }
         }
@@ -51,24 +51,24 @@ namespace Map {
                     int air_tiles = 0;
                     for (int i = -1; i <= 1; ++i) {
                         for (int j = -1; j <= 1; ++j) {
-                            if (world_copy->GetCell(y + i, x + j) == 7) ++air_tiles;
-                            else if (world_copy->GetCell(y + i, x + j) == 2) ++stone_tiles;
+                            if (world_copy->GetCell(y + i, x + j) == Bg) ++air_tiles;
+                            else if (world_copy->GetCell(y + i, x + j) == Stone) ++stone_tiles;
                         }
                     }
                     if (air_tiles > 4) {
                         if (y > noise) {
-                            world->SetCell(y, x, 7);
+                            world->SetCell(y, x, Bg);
                         } else {
                             if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                                world->SetCell(y, x, 7);
+                                world->SetCell(y, x, Bg);
                         }
                     }
                     if (stone_tiles > 4) {
                         if (y > noise) {
-                            world->SetCell(y, x, 2);
+                            world->SetCell(y, x, Stone);
                         } else {
                             if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                                world->SetCell(y, x, 2);
+                                world->SetCell(y, x, Stone);
                         }
                     }
                 }
@@ -78,9 +78,9 @@ namespace Map {
 
         for (int y = 0; y < world_size_y_blocks; ++y) {
             for (int x = 0; x < world_size_x_blocks; ++x) {
-                if (world->GetCell(y, x) == 2)
+                if (world->GetCell(y, x) == Stone)
                     if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.43)
-                        world->SetCell(y, x, 1);
+                        world->SetCell(y, x, Dirt);
             }
         }
         world_copy = world;
@@ -92,12 +92,12 @@ namespace Map {
                     int dirt_tiles = 0;
                     for (int i = -1; i <= 1; ++i) {
                         for (int j = -1; j <= 1; ++j) {
-                            if (world_copy->GetCell(y + i, x + j) == 1) ++dirt_tiles;
-                            else if (world_copy->GetCell(y + i, x + j) == 2) ++stone_tiles;
+                            if (world_copy->GetCell(y + i, x + j) == Dirt) ++dirt_tiles;
+                            else if (world_copy->GetCell(y + i, x + j) == Stone) ++stone_tiles;
                         }
                     }
-                    if (dirt_tiles > 4) world->SetCell(y, x, 1);
-                    if (stone_tiles > 4) world->SetCell(y, x, 2);
+                    if (dirt_tiles > 4) world->SetCell(y, x, Dirt);
+                    if (stone_tiles > 4) world->SetCell(y, x, Stone);
                 }
             }
             world_copy = world;
@@ -108,7 +108,7 @@ namespace Map {
             int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2;
             for (int y = 0; y < world_size_y_blocks; ++y) {
                 if (y > noise && y < noise + 5)
-                    world->SetCell(y, x, 1);
+                    world->SetCell(y, x, Dirt);
             }
         }
 
@@ -119,12 +119,12 @@ namespace Map {
                     int dirt_tiles = 0;
                     for (int i = -1; i <= 1; ++i) {
                         for (int j = -1; j <= 1; ++j) {
-                            if (world_copy->GetCell(y + i, x + j) == 1) ++dirt_tiles;
-                            else if (world_copy->GetCell(y + i, x + j) == 2) ++stone_tiles;
+                            if (world_copy->GetCell(y + i, x + j) == Dirt) ++dirt_tiles;
+                            else if (world_copy->GetCell(y + i, x + j) == Stone) ++stone_tiles;
                         }
                     }
-                    if (dirt_tiles > 4) world->SetCell(y, x, 1);
-                    if (stone_tiles > 4) world->SetCell(y, x, 2);
+                    if (dirt_tiles > 4) world->SetCell(y, x, Dirt);
+                    if (stone_tiles > 4) world->SetCell(y, x, Stone);
                 }
             }
             world_copy = world;
@@ -145,24 +145,24 @@ namespace Map {
             bool tree_grown = false;
 
             for (int y = 0; y < world_size_y_blocks; ++y) {
-                if (world->GetCell(y, x) == 1) {
+                if (world->GetCell(y, x) == Dirt) {
                     if (!found_first_block) {
                         found_first_block = true;
-                        world->SetCell(y, x, 5);
+                        world->SetCell(y, x, Grass);
                         if (grow_tree) {
                             bool last_grown = false;
                             for (int i = 0; i >= -(std::rand() % 6 + 10); --i) {
-                                world->SetCell(y + i - 1, x, 6);
+                                world->SetCell(y + i - 1, x, Wood);
                                 if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.2) {
                                     if (!last_grown) {
-                                        world->SetCell(y + i - 1, x - 1, 6);
+                                        world->SetCell(y + i - 1, x - 1, Wood);
                                         last_grown = true;
                                     } else {
                                         last_grown = false;
                                     }
                                 } else if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) > 0.8) {
                                     if (!last_grown) {
-                                        world->SetCell(y + i - 1, x + 1, 6);
+                                        world->SetCell(y + i - 1, x + 1, Wood);
                                         last_grown = true;
                                     } else {
                                         last_grown = false;

@@ -1,245 +1,164 @@
-#include "./entity.hpp"
-#include <iostream>
-#include <raylib.h>
+#include "entity.hpp"
+#include "../world/tiles.hpp"
 #include <raymath.h>
-#include "../world/world.hpp"
+#include <iostream>
 
-#define SLOW_DOWN 0.01
-#define MAX_SPEED 0.25
+namespace Engine {
+    Entity::Entity(Map::World* world, Texture2D texture, bool noClip) {
+        this->bounds = {0.0f, 0.0f, 16.0f, 16.0f};
+        this->velocity = {0.0f, 0.0f};
+        this->world = world;
+        this->noClip = noClip;
+        this->texture = texture;
+    }
 
-namespace Entities {
-    void addTile(std::vector<Rectangle> &rects, Map::World* world, float x, float y, int type) {
-        if (world->GetCell(y, x) == type) {
-            rects.push_back((Rectangle){x - 0.01f, y - 0.01f, 1.0f + 0.02f, 1.0f + 0.02f});
-            // DrawRectangle((x) * 16, (y) * 16, 16.0f, 16.0f, YELLOW);
+    Entity::~Entity() {}
+
+    void Entity::updatePosition(bool debug) {
+        Vector2 offset = {0.0f, 0.0f};
+        offset.x += this->velocity.x;
+        offset.y += this->velocity.y;
+        if (offset.x != 0 && offset.y != 0) {
+            offset.x = offset.x / 1.4142;
+            offset.y = offset.y / 1.4142;
         }
-    }
-
-    void Entity::resolveCollisions() {
-        std::vector<Rectangle> rects;
-        addTile(rects, world, floorf(bound.x - 1), floorf(bound.y - 1), 5);
-        addTile(rects, world, floorf(bound.x - 1), floorf(bound.y), 5);
-        addTile(rects, world, floorf(bound.x - 1), floorf(bound.y + bound.height / 16), 5);
-        addTile(rects, world, floorf(bound.x),     floorf(bound.y - 1), 5);
-        addTile(rects, world, floorf(bound.x),     floorf(bound.y), 5);
-        addTile(rects, world, floorf(bound.x),     floorf(bound.y + bound.height / 16), 5);
-        addTile(rects, world, floorf(bound.x + bound.width / 16), floorf(bound.y - 1), 5);
-        addTile(rects, world, floorf(bound.x + bound.width / 16), floorf(bound.y), 5);
-        addTile(rects, world, floorf(bound.x + bound.width / 16), floorf(bound.y + bound.height / 16), 5);
-        
-        for (const auto rect : rects) {
-            if (CheckCollisionRecs(bound, rect)) {
-                bool corner_up_left, corner_up_right, corner_down_left, corner_down_right;
-                if (CheckCollisionPointRec((Vector2){bound.x, bound.y}, rect))
-                    corner_up_left = true;
-                if (CheckCollisionPointRec((Vector2){bound.x + (bound.width / 16), bound.y}, rect))
-                    corner_up_right = true;
-                if (CheckCollisionPointRec((Vector2){bound.x, bound.y + (bound.height / 16)}, rect))
-                    corner_down_left = true;
-                if (CheckCollisionPointRec((Vector2){bound.x + (bound.width / 16), bound.y + (bound.height / 16)}, rect))
-                    corner_down_right = true;
-                
-                // if (corner_up_left)
-                //     DrawCircle(bound.x * 16, bound.y * 16, 4, YELLOW);
-                // if (corner_up_right)
-                //     DrawCircle(bound.x * 16 + bound.width, bound.y * 16, 4, YELLOW);
-                // if (corner_down_left)
-                //     DrawCircle(bound.x * 16, bound.y * 16 + bound.height, 4, YELLOW);
-                // if (corner_down_right)
-                //     DrawCircle(bound.x * 16 + bound.width, bound.y * 16 + bound.height, 4, YELLOW);
-                
-                if (corner_up_left && corner_down_left && !corner_up_right && !corner_down_right) {
-                    bound.x += (rect.x + rect.width) - bound.x;
-                    if (speed.x < 0.0f)
-                        speed.x = 0.0f;
-                } else if (corner_up_right && corner_down_right && !corner_up_left && !corner_down_left) {
-                    bound.x -= (bound.x + bound.width / 16) - rect.x;
-                    if (speed.x > 0.0f)
-                        speed.x = 0.0f;
-                } else if (corner_up_left && corner_up_right && !corner_down_left && !corner_down_right) {
-                    bound.y += (rect.y + rect.height) - bound.y;
-                    if (speed.y < 0.0f)
-                        speed.y = 0.0f;
-                } else if (corner_down_left && corner_down_right && !corner_up_left && !corner_up_right) {
-                    bound.y -= (bound.y + bound.height / 16) - rect.y;
-                    if (speed.y > 0.0f)
-                        speed.y = 0.0f;
-                }
-
-                if (corner_up_left && !corner_up_right && !corner_down_left && !corner_down_right) {
-                    float correction_y = (rect.y + rect.height) - bound.y;
-                    float correction_x = (rect.x + rect.width) - bound.x;
-                    if (abs(correction_y) <= abs(correction_x)) {
-                        bound.y += correction_y;
-                        if (speed.y < 0.0f)
-                            speed.y = 0.0f;
-                    } else {
-                        bound.x += correction_x;
-                        if (speed.x < 0.0f)
-                            speed.x = 0.0f;
-                    }
-                } else if (!corner_up_left && corner_up_right && !corner_down_left && !corner_down_right) {
-                    float correction_y = (rect.y + rect.height) - bound.y;
-                    float correction_x = -((bound.x + bound.width / 16) - rect.x);
-                    if (abs(correction_y) <= abs(correction_x)) {
-                        bound.y += correction_y;
-                        if (speed.y < 0.0f)
-                            speed.y = 0.0f;
-                    } else {
-                        bound.x += correction_x;
-                        if (speed.x > 0.0f)
-                            speed.x = 0.0f;
-                    }
-                } else if (!corner_up_left && !corner_up_right && corner_down_left && !corner_down_right) {
-                    float correction_y = -((bound.y + bound.height / 16) - rect.y);
-                    float correction_x = (rect.x + rect.width) - bound.x;
-                    if (abs(correction_y) <= abs(correction_x)) {
-                        bound.y += correction_y;
-                        if (speed.y > 0.0f)
-                            speed.y = 0.0f;
-                    } else {
-                        bound.x += correction_x;
-                        if (speed.x < 0.0f)
-                            speed.x = 0.0f;
-                    }
-                } else if (!corner_up_left && !corner_up_right && !corner_down_left && corner_down_right) {
-                    float correction_y = -((bound.y + bound.height / 16) - rect.y);
-                    float correction_x = -((bound.x + bound.width / 16) - rect.x);
-                    if (abs(correction_y) <= abs(correction_x)) {
-                        bound.y += correction_y;
-                        if (speed.y > 0.0f)
-                            speed.y = 0.0f;
-                    } else {
-                        bound.x += correction_x;
-                        if (speed.x > 0.0f)
-                            speed.x = 0.0f;
-                    }
-                }
-            }
-        }
-    }
-
-    Entity::Entity(Rectangle Bound, Texture2D Texture, Map::World* World) {
-        bound = Bound;
-        texture = Texture;
-        world = World;
-    }
-
-    Entity::Entity(Vector2 Position, Texture2D Texture, Map::World* World) {
-        texture = Texture;
-        bound = (Rectangle){Position.x, Position.y, (float)texture.width, (float)texture.height};
-        world = World;
-    }
-
-
-    Entity::Entity(Rectangle Bound, std::string Texture_path, Map::World* World) {
-        bound = Bound;
-        texture = LoadTexture(Texture_path.c_str());
-        world = World;
-    }
-
-    Entity::Entity(Vector2 Position, std::string Texture_path, Map::World* World) {
-        texture = LoadTexture(Texture_path.c_str());
-        bound = (Rectangle){Position.x, Position.y, (float)texture.width, (float)texture.height};
-        world = World;
-    }
-
-    void Entity::Move(float x, float y) {
-        bound.x += x;
-        bound.y += y;
-        resolveCollisions();
-    }
-
-    void Entity::Move(Vector2 Pos) {
-        bound.x += Pos.x;
-        bound.y += Pos.y;
-        resolveCollisions();
-    }
-
-    void Entity::Update() {
-        if (speed.x > SLOW_DOWN) {
-            speed.x -= SLOW_DOWN;
-        } else if (speed.x < -SLOW_DOWN) {
-            speed.x += SLOW_DOWN;
+        if (noClip == false) {
+            Vector2 newPos = {this->bounds.x + offset.x, this->bounds.y + offset.y};
+            this->ResolveWorldCollisions(newPos, debug);
         } else {
-            speed.x = 0;
+            this->bounds.x += offset.x;
+            this->bounds.y += offset.y;
         }
-        if (speed.y > SLOW_DOWN) {
-            speed.y -= SLOW_DOWN;
-        } else if (speed.y < -SLOW_DOWN) {
-            speed.y += SLOW_DOWN;
-        } else {
-            speed.y = 0;
-        }
-        if (speed.x > MAX_SPEED) {
-            speed.x = MAX_SPEED;
-        } else if (speed.x < -MAX_SPEED) {
-            speed.x = -MAX_SPEED;
-        }
-        if (speed.y > MAX_SPEED) {
-            speed.y = MAX_SPEED;
-        } else if (speed.y < -MAX_SPEED) {
-            speed.y = -MAX_SPEED;
-        }
-        resolveCollisions();
-        bound.x += speed.x;
-        bound.y += speed.y;
+        this->lastVelocity = this->velocity;
+        this->velocity = {0.0f, 0.0f};
     }
 
-    Rectangle Entity::GetBound() {
-        return bound;
+    void Entity::AddForce(Vector2 force) {
+        this->velocity = Vector2Add(this->velocity, force);
     }
 
-    Vector2 Entity::GetPos() {
-        return (Vector2){bound.x, bound.y};
-    }
-
-    Vector2 Entity::GetSize() {
-        return (Vector2){bound.width, bound.height};
-    }
-
-    Vector2 Entity::GetSpeed() {
-        return speed;
-    }
-
-    void Entity::SetBound(Rectangle Buond) {
-        bound = Buond;
-        resolveCollisions();
-    }
-
-    void Entity::SetPos(Vector2 Pos) {
-        bound.x = Pos.x;
-        bound.y = Pos.y;
-        resolveCollisions();
-    }
-
-    void Entity::SetSize(Vector2 Size) {
-        bound.width = Size.x;
-        bound.height = Size.y;
-        resolveCollisions();
-    }
-
-    void Entity::SetSpeed(Vector2 Speed) {
-        speed = Speed;
-    }
-
-    void Entity::AddToSpeed(Vector2 AddSpeed) {
-        speed.x += AddSpeed.x;
-        speed.y += AddSpeed.y;
-    }
-
-    void Entity::SetWorld(Map::World* NewWorld, float x, float y) {
-        world = NewWorld;
-        bound.x = x;
-        bound.y = y;
-        resolveCollisions();
-    }
+    void Entity::Update(bool debug) {}
 
     void Entity::Draw(int tile_size) {
         DrawTexturePro(
-            texture, (Rectangle){0.0f, 0.0f, (float)texture.width, (float)texture.height},
-            (Rectangle){bound.x * tile_size, bound.y * tile_size, bound.width, bound.height},
-            (Vector2){0, 0}, 0.0f, WHITE
+            this->texture,
+            (Rectangle){0.0f, 0.0f, (float)this->texture.width, (float)this->texture.height},
+            (Rectangle){this->bounds.x * tile_size, this->bounds.y * tile_size, this->bounds.width * tile_size, this->bounds.height * tile_size},
+            (Vector2){0, 0},
+            0.0f,
+            WHITE
         );
+    }
+
+    void Entity::ResolveWorldCollisions(const Vector2 newPlayerPos, bool debug) {
+        std::vector<Rectangle> collidingTiles = {};
+        for (int x = round(this->bounds.x) - 2; x < round(this->bounds.x) + 3; x++) {
+            for (int y = round(this->bounds.y) - 2; y < round(this->bounds.y) + 3; y++) {
+                if (x < 0 || y < 0 ||
+                    x >= this->world->world_size_x * this->world->Data[0][0]->chunk_size_x ||
+                    y >= this->world->world_size_y * this->world->Data[0][0]->chunk_size_y
+                ) {
+                    continue;
+                }
+                if (isSolid(this->world->GetCell(y, x)))
+                    collidingTiles.push_back({x * 16.0f, y * 16.0f, 16.0f, 16.0f});
+            }
+        }
+        Vector2 resultPlayerPos = {newPlayerPos.x * 16.0f, newPlayerPos.y * 16.0f};
+        for (Rectangle tile : collidingTiles) {
+            resultPlayerPos = this->ResolveCollisionBox((Rectangle){this->bounds.x * 16.0f, this->bounds.y * 16.0f, this->bounds.width * 16.0f, this->bounds.height * 16.0f}, resultPlayerPos, tile, debug);
+        }
+        this->bounds.x = resultPlayerPos.x / 16.0f;
+        this->bounds.y = resultPlayerPos.y / 16.0f;
+    }
+
+    Vector2 Entity::ResolveCollisionBox(const Rectangle player, const Vector2 newPlayerPos, const Rectangle box, bool debug) {
+        Vector2 resultPlayerPos = {newPlayerPos.x, newPlayerPos.y};
+        Ray ray = {0};
+        ray.position = (Vector3){player.x + player.width / 2.0f, player.y + player.height / 2.0f, 0.0f};
+        ray.direction = Vector3Normalize(Vector3Subtract({newPlayerPos.x, newPlayerPos.y, 0.0f}, {player.x, player.y, 0.0f}));
+        if (debug)
+            DrawRay(ray, RED);
+        Rectangle oversizedBox = {
+            box.x - player.width / 2.0f,
+            box.y - player.height / 2.0f,
+            box.width + player.width,
+            box.height + player.height
+        };
+        RayCollision collision = GetRayCollisionBox(ray, BoundingBox{
+            (Vector3){oversizedBox.x, oversizedBox.y, 0.0f},
+            (Vector3){oversizedBox.x + oversizedBox.width, oversizedBox.y + oversizedBox.height, 0.0f}
+        });
+
+        if (collision.hit == 1) {
+            float maxDistanceX = Vector2Distance(
+                {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                {newPlayerPos.x + player.width / 2.0f, player.y + player.height / 2.0f}
+            );
+            float DistanceX = Vector2Distance(
+                {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                {collision.point.x, player.y + player.height / 2.0f}
+            );
+
+            if (DistanceX == 0) {
+                Ray rayHor = {0};
+                rayHor.position = (Vector3){player.x + player.width / 2.0f, player.y + player.height / 2.0f, 0.0f};
+                rayHor.direction = Vector3Normalize(Vector3Subtract({newPlayerPos.x, 0.0f, 0.0f}, {player.x, 0.0f, 0.0f}));
+                RayCollision collisionHor = GetRayCollisionBox(rayHor, BoundingBox{
+                    (Vector3){oversizedBox.x, oversizedBox.y, 0.0f},
+                    (Vector3){oversizedBox.x + oversizedBox.width, oversizedBox.y + oversizedBox.height, 0.0f}
+                });
+                if (collisionHor.hit == 1) {
+                    float maxDistanceHor = Vector2Distance(
+                        {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                        {newPlayerPos.x + player.width / 2.0f, player.y + player.height / 2.0f}
+                    );
+                    float DistanceHor = Vector2Distance(
+                        {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                        {collisionHor.point.x, player.y + player.height / 2.0f}
+                    );
+                    if (DistanceHor < maxDistanceHor) {
+                        resultPlayerPos.x = collisionHor.point.x - player.width / 2.0f;
+                    }
+                }
+            } else if (DistanceX < maxDistanceX) {
+                resultPlayerPos.x = collision.point.x - player.width / 2.0f;
+            }
+
+            float maxDistanceY = Vector2Distance(
+                {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                {player.x + player.width / 2.0f, newPlayerPos.y + player.height / 2.0f}
+            );
+            float DistanceY = Vector2Distance(
+                {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                {player.x + player.width / 2.0f, collision.point.y}
+            );
+            if (DistanceY == 0) {
+                Ray rayVer = {0};
+                rayVer.position = (Vector3){player.x + player.width / 2.0f, player.y + player.height / 2.0f, 0.0f};
+                rayVer.direction = Vector3Normalize(Vector3Subtract({0.0f, newPlayerPos.y, 0.0f}, {0.0f, player.y, 0.0f}));
+                RayCollision collisionVer = GetRayCollisionBox(rayVer, BoundingBox{
+                    (Vector3){oversizedBox.x, oversizedBox.y, 0.0f},
+                    (Vector3){oversizedBox.x + oversizedBox.width, oversizedBox.y + oversizedBox.height, 0.0f}
+                });
+                if (collisionVer.hit == 1) {
+                    float maxDistanceVer = Vector2Distance(
+                        {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                        {player.x + player.width / 2.0f, newPlayerPos.y + player.height / 2.0f}
+                    );
+                    float DistanceVer = Vector2Distance(
+                        {player.x + player.width / 2.0f, player.y + player.height / 2.0f},
+                        {player.x + player.width / 2.0f, collisionVer.point.y}
+                    );
+                    if (DistanceVer < maxDistanceVer) {
+                        resultPlayerPos.y = collisionVer.point.y - player.height / 2.0f;
+                    }
+                }
+            } else if (DistanceY < maxDistanceY) {
+                resultPlayerPos.y = collision.point.y - player.height / 2.0f;
+            }
+        }
+
+        return resultPlayerPos;
     }
 }

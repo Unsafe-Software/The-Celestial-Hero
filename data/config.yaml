@@ -13,12 +13,14 @@ startup:
 # If true, smoothes the camera movement.
 smooth_cam: true
 
+zoom: 1.25
+
 # Size of a block in the world
 tile_size: 16
 
 # Information about the player
 player:
-  move_speed: 0.025
+  move_speed: 5
 
 # Innformation about the world
 world:
