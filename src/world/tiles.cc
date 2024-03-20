@@ -10,5 +10,5 @@ namespace Engine {
             }
             return false;
         }
-    }
-}
+    }  // namespace World
+}  // namespace Engine

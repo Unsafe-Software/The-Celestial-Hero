@@ -8,7 +8,8 @@ namespace Engine {
 
             for (int x = 0; x < world_size_x_blocks; ++x) {
                 float loc_x = x / 3;
-                int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2;
+                int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) +
+                            world_size_y_blocks / 2;
                 for (int y = 0; y < world_size_y_blocks; ++y) {
                     if (y > noise) {
                         world->SetCell(y, x, Stone);
@@ -20,10 +21,12 @@ namespace Engine {
             for (int y = 0; y < world_size_y_blocks; ++y) {
                 for (int x = 0; x < world_size_x_blocks; ++x) {
                     float loc_x = x / 3;
-                    int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2 + 10;
+                    int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) +
+                                world_size_y_blocks / 2 + 10;
                     if (world->GetCell(y, x) == Stone)
                         if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.465) {
-                            if (y > noise) world->SetCell(y, x, Bg);
+                            if (y > noise)
+                                world->SetCell(y, x, Bg);
                             else if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
                                 world->SetCell(y, x, Bg);
                         }
@@ -35,29 +38,30 @@ namespace Engine {
                 for (int y = 0; y < world_size_y_blocks; ++y) {
                     for (int x = 0; x < world_size_x_blocks; ++x) {
                         float loc_x = x / 3;
-                        int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2 + 10;
+                        int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) -
+                                    FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2 + 10;
                         int stone_tiles = 0;
                         int air_tiles = 0;
                         for (int i = -1; i <= 1; ++i) {
                             for (int j = -1; j <= 1; ++j) {
-                                if (world_copy->GetCell(y + i, x + j) == Bg) ++air_tiles;
-                                else if (world_copy->GetCell(y + i, x + j) == Stone) ++stone_tiles;
+                                if (world_copy->GetCell(y + i, x + j) == Bg)
+                                    ++air_tiles;
+                                else if (world_copy->GetCell(y + i, x + j) == Stone)
+                                    ++stone_tiles;
                             }
                         }
                         if (air_tiles > 4) {
                             if (y > noise) {
                                 world->SetCell(y, x, Bg);
                             } else {
-                                if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                                    world->SetCell(y, x, Bg);
+                                if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1) world->SetCell(y, x, Bg);
                             }
                         }
                         if (stone_tiles > 4) {
                             if (y > noise) {
                                 world->SetCell(y, x, Stone);
                             } else {
-                                if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
-                                    world->SetCell(y, x, Stone);
+                                if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1) world->SetCell(y, x, Stone);
                             }
                         }
                     }
@@ -68,8 +72,7 @@ namespace Engine {
             for (int y = 0; y < world_size_y_blocks; ++y) {
                 for (int x = 0; x < world_size_x_blocks; ++x) {
                     if (world->GetCell(y, x) == Stone)
-                        if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.43)
-                            world->SetCell(y, x, Dirt);
+                        if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.43) world->SetCell(y, x, Dirt);
                 }
             }
             world_copy = world;
@@ -81,8 +84,10 @@ namespace Engine {
                         int dirt_tiles = 0;
                         for (int i = -1; i <= 1; ++i) {
                             for (int j = -1; j <= 1; ++j) {
-                                if (world_copy->GetCell(y + i, x + j) == Dirt) ++dirt_tiles;
-                                else if (world_copy->GetCell(y + i, x + j) == Stone) ++stone_tiles;
+                                if (world_copy->GetCell(y + i, x + j) == Dirt)
+                                    ++dirt_tiles;
+                                else if (world_copy->GetCell(y + i, x + j) == Stone)
+                                    ++stone_tiles;
                             }
                         }
                         if (dirt_tiles > 4) world->SetCell(y, x, Dirt);
@@ -94,10 +99,10 @@ namespace Engine {
 
             for (int x = 0; x < world_size_x_blocks; ++x) {
                 float loc_x = x / 3;
-                int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2;
+                int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) +
+                            world_size_y_blocks / 2;
                 for (int y = 0; y < world_size_y_blocks; ++y) {
-                    if (y > noise && y < noise + 5)
-                        world->SetCell(y, x, Dirt);
+                    if (y > noise && y < noise + 5) world->SetCell(y, x, Dirt);
                 }
             }
 
@@ -108,8 +113,10 @@ namespace Engine {
                         int dirt_tiles = 0;
                         for (int i = -1; i <= 1; ++i) {
                             for (int j = -1; j <= 1; ++j) {
-                                if (world_copy->GetCell(y + i, x + j) == Dirt) ++dirt_tiles;
-                                else if (world_copy->GetCell(y + i, x + j) == Stone) ++stone_tiles;
+                                if (world_copy->GetCell(y + i, x + j) == Dirt)
+                                    ++dirt_tiles;
+                                else if (world_copy->GetCell(y + i, x + j) == Stone)
+                                    ++stone_tiles;
                             }
                         }
                         if (dirt_tiles > 4) world->SetCell(y, x, Dirt);
@@ -165,5 +172,5 @@ namespace Engine {
                 }
             }
         }
-    }
-}
+    }  // namespace World
+}  // namespace Engine

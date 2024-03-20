@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdlib>
-#include "world.hh"
+
 #include "../gfx/texture.hh"
+#include "world.hh"
 
 #define FACTOR_E 0.5
 #define SCALE_E 0.3
@@ -16,4 +17,4 @@ namespace Engine {
     namespace World {
         void GenerateWorld(World* world);
     }
-}
+}  // namespace Engine

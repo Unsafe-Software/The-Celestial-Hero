@@ -1,4 +1,5 @@
 #include "world.hh"
+
 #include <iostream>
 
 namespace Engine {
@@ -12,9 +13,7 @@ namespace Engine {
         }
 
         void Chunk::SetDataCell(int y, int x, Tile tile) {
-            if (y < 0 || y >= chunk_size_y ||
-                x < 0 || x >= chunk_size_x
-            ) {
+            if (y < 0 || y >= chunk_size_y || x < 0 || x >= chunk_size_x) {
                 return;
             }
 
@@ -42,9 +41,7 @@ namespace Engine {
         }
 
         Tile Chunk::GetDataCell(int y, int x) {
-            if (y < 0 || y >= chunk_size_y ||
-                x < 0 || x >= chunk_size_x
-            ) {
+            if (y < 0 || y >= chunk_size_y || x < 0 || x >= chunk_size_x) {
                 return Debug;
             }
 
@@ -97,27 +94,24 @@ namespace Engine {
             world_size_x = width;
             world_size_y = height;
             for (int y = 0; y < height; ++y) {
-            std::vector<Chunk*> row;
-            for (int x = 0; x < width; ++x) {
-                row.push_back(new Chunk());
-            }
-            Data.push_back(row);
+                std::vector<Chunk*> row;
+                for (int x = 0; x < width; ++x) {
+                    row.push_back(new Chunk());
+                }
+                Data.push_back(row);
             }
         }
 
         void World::SetChunk(int y, int x, Chunk* chunk) {
-            if (y < 0 || y >= chunk->chunk_size_y ||
-                x < 0 || x >= chunk->chunk_size_x) {
-            return;
+            if (y < 0 || y >= chunk->chunk_size_y || x < 0 || x >= chunk->chunk_size_x) {
+                return;
             }
 
             Data[y][x] = chunk;
         }
 
         void World::SetCell(int y, int x, Tile data) {
-            if (y < 0 || y >= world_size_y * Data[0][0]->chunk_size_y ||
-                x < 0 || x >= world_size_x * Data[0][0]->chunk_size_x
-            ) {
+            if (y < 0 || y >= world_size_y * Data[0][0]->chunk_size_y || x < 0 || x >= world_size_x * Data[0][0]->chunk_size_x) {
                 return;
             }
 
@@ -130,14 +124,10 @@ namespace Engine {
         }
 
         void World::SetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x, Tile data) {
-            if (in_chunk_y < 0 || in_chunk_y >= Data[0][0]->chunk_size_y ||
-                in_chunk_x < 0 || in_chunk_x >= Data[0][0]->chunk_size_x
-            ) {
+            if (in_chunk_y < 0 || in_chunk_y >= Data[0][0]->chunk_size_y || in_chunk_x < 0 || in_chunk_x >= Data[0][0]->chunk_size_x) {
                 return;
             }
-            if (chunk_y < 0 || chunk_y >= world_size_y ||
-                chunk_x < 0 || chunk_x >= world_size_x
-            ) {
+            if (chunk_y < 0 || chunk_y >= world_size_y || chunk_x < 0 || chunk_x >= world_size_x) {
                 return;
             }
 
@@ -145,9 +135,7 @@ namespace Engine {
         }
 
         Tile World::GetCell(int y, int x) {
-            if (y < 0 || y >= world_size_y * Data[0][0]->chunk_size_y ||
-                x < 0 || x >= world_size_x * Data[0][0]->chunk_size_x
-            ) {
+            if (y < 0 || y >= world_size_y * Data[0][0]->chunk_size_y || x < 0 || x >= world_size_x * Data[0][0]->chunk_size_x) {
                 return Debug;
             }
 
@@ -160,18 +148,14 @@ namespace Engine {
         }
 
         Tile World::GetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x) {
-            if (in_chunk_y < 0 || in_chunk_y >= Data[0][0]->chunk_size_y ||
-                in_chunk_x < 0 || in_chunk_x >= Data[0][0]->chunk_size_x
-            ) {
+            if (in_chunk_y < 0 || in_chunk_y >= Data[0][0]->chunk_size_y || in_chunk_x < 0 || in_chunk_x >= Data[0][0]->chunk_size_x) {
                 return Data[0][0]->Data[0][0];
             }
-            if (chunk_y < 0 || chunk_y >= world_size_y ||
-                chunk_x < 0 || chunk_x >= world_size_x
-            ) {
+            if (chunk_y < 0 || chunk_y >= world_size_y || chunk_x < 0 || chunk_x >= world_size_x) {
                 return Data[0][0]->Data[0][0];
             }
 
             return Data[chunk_y][chunk_x]->Data[in_chunk_y][in_chunk_x];
         }
-    }
-}
+    }  // namespace World
+}  // namespace Engine

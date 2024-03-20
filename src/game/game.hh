@@ -1,19 +1,20 @@
 #pragma once
-#include <sstream>
-#include <iomanip>
 #include <raylib.h>
 #include <raymath.h>
 #include <yaml-cpp/yaml.h>
 
+#include <iomanip>
+#include <sstream>
+
+#include "../entities/entity.hh"
+#include "../entities/player.hh"
 #include "../gfx/texture.hh"
 #include "../world/world.hh"
 #include "../world/worldgen.hh"
-#include "../entities/entity.hh"
-#include "../entities/player.hh"
 
 namespace Engine {
     class Game {
-    private:
+       private:
         YAML::Node config;
         Graphics::Textures blocks;
         World::World world;
@@ -28,11 +29,11 @@ namespace Engine {
 
         void updateCamera();
 
-    public:
+       public:
         Game();
         ~Game();
         void Update();
 
         bool ShouldClose();
     };
-}
+}  // namespace Engine

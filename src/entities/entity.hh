@@ -1,15 +1,15 @@
 #pragma once
-#include <string>
-
 #include <raylib.h>
 #include <raymath.h>
+
+#include <string>
 
 #include "../world/world.hh"
 
 namespace Engine {
     namespace Entities {
         class Entity {
-        public:
+           public:
             Rectangle bounds;
             Vector2 velocity;
             Vector2 lastVelocity;
@@ -29,5 +29,5 @@ namespace Engine {
             Vector2 ResolveCollisionBox(const Rectangle player, const Vector2 newPlayerPos, const Rectangle box, bool debug);
             void ResolveWorldCollisions(const Vector2 newPlayerPos, bool debug);
         };
-    }
-}
+    }  // namespace Entities
+}  // namespace Engine

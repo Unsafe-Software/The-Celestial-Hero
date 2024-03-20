@@ -1,26 +1,24 @@
 #include "game.hh"
+
 #include <iostream>
 
 namespace Engine {
-    Game::Game() { // : config(YAML::LoadFile("./data/config.yaml")), blocks("./data/assets/blocks.yaml"), world(0, 0), player(&this->world)
+    Game::Game() {
         this->config = YAML::LoadFile("./data/config.yaml");
 
         if (!this->config["debug"] || this->config["debug"].as<bool>() != true) {
             SetTraceLogLevel(LOG_WARNING);
         }
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-        InitWindow(
-            (this->config["startup"]["window"]["width"]) ? this->config["startup"]["window"]["width"].as<int>() : 1280,
+        InitWindow((this->config["startup"]["window"]["width"]) ? this->config["startup"]["window"]["width"].as<int>() : 1280,
             (this->config["startup"]["window"]["height"]) ? this->config["startup"]["window"]["height"].as<int>() : 720,
-            (this->config["startup"]["window"]["title_add"]) ?
-                ("The Celestial Hero: " + this->config["startup"]["window"]["title_add"].as<std::string>()).c_str() :
-                "The Celestial Hero"
-        );
+            (this->config["startup"]["window"]["title_add"])
+                ? ("The Celestial Hero: " + this->config["startup"]["window"]["title_add"].as<std::string>()).c_str()
+                : "The Celestial Hero");
         SetTargetFPS((this->config["startup"]["window"]["target_fps"]) ? this->config["startup"]["window"]["target_fps"].as<int>() : 60);
 
         this->blocks = Graphics::Textures("./data/assets/blocks.yaml");
-        this->world = World::World(
-            (this->config["world"]["width"]) ? this->config["world"]["width"].as<int>() : 10,
+        this->world = World::World((this->config["world"]["width"]) ? this->config["world"]["width"].as<int>() : 10,
             (this->config["world"]["height"]) ? this->config["world"]["height"].as<int>() : 5),
         this->player = Entities::Player(&this->world);
 
@@ -41,7 +39,8 @@ namespace Engine {
 
         this->debug = (this->config["debug"]) ? this->config["debug"].as<bool>() : false;
         this->smooth_cam = (this->config["smooth_cam"]) ? this->config["smooth_cam"].as<bool>() : false;
-        this->player_speed = (this->config["player"]["move_speed"]) ? this->config["player"]["move_speed"].as<float>() / this->tile_size : 1.0f / this->tile_size;
+        this->player_speed =
+            (this->config["player"]["move_speed"]) ? this->config["player"]["move_speed"].as<float>() / this->tile_size : 1.0f / this->tile_size;
     }
 
     Game::~Game() {
@@ -77,27 +76,17 @@ namespace Engine {
         for (int y = 0; y < this->world.world_size_y; ++y) {
             for (int x = 0; x < this->world.world_size_x; ++x) {
                 if (CheckCollisionRecs(
-                    (Rectangle){
-                        (float)x * tile_size * this->world.Data[0][0]->chunk_size_x,
-                        (float)y * tile_size * this->world.Data[0][0]->chunk_size_y,
-                        (float)this->world.Data[0][0]->chunk_size_x * tile_size,
-                        (float)this->world.Data[0][0]->chunk_size_y * tile_size
-                    },
-                    (Rectangle){
-                        camera.target.x - GetScreenWidth() / 2,
-                        camera.target.y - GetScreenHeight() / 2,
-                        (float)GetScreenWidth(), (float)GetScreenHeight()
-                    }
-                )) {
+                        (Rectangle){(float)x * tile_size * this->world.Data[0][0]->chunk_size_x, (float)y * tile_size * this->world.Data[0][0]->chunk_size_y,
+                            (float)this->world.Data[0][0]->chunk_size_x * tile_size, (float)this->world.Data[0][0]->chunk_size_y * tile_size},
+                        (Rectangle){camera.target.x - GetScreenWidth() / 2, camera.target.y - GetScreenHeight() / 2, (float)GetScreenWidth(),
+                            (float)GetScreenHeight()})) {
                     for (int chunk_y = 0; chunk_y < this->world.Data[0][0]->chunk_size_y; ++chunk_y) {
                         for (int chunk_x = 0; chunk_x < this->world.Data[0][0]->chunk_size_x; ++chunk_x) {
-                            this->blocks.GetTextureI(
-                                this->world.GetCellByChunk(y, x, chunk_y, chunk_x)
-                            ).Draw(
-                                this->blocks.GetTexture(),
-                                (Vector2){((float)x * this->world.Data[0][0]->chunk_size_x + chunk_x) * tile_size,
-                                ((float)y * this->world.Data[0][0]->chunk_size_y + chunk_y) * tile_size}, 1.0f, 0.0
-                            );
+                            this->blocks.GetTextureI(this->world.GetCellByChunk(y, x, chunk_y, chunk_x))
+                                .Draw(this->blocks.GetTexture(),
+                                    (Vector2){((float)x * this->world.Data[0][0]->chunk_size_x + chunk_x) * tile_size,
+                                        ((float)y * this->world.Data[0][0]->chunk_size_y + chunk_y) * tile_size},
+                                    1.0f, 0.0);
                             ++tiles_drawn;
                         }
                     }
@@ -116,39 +105,24 @@ namespace Engine {
 
             std::ostringstream delta_stream;
             delta_stream << std::fixed << std::setprecision(3) << GetFrameTime() * 1000;
-            DrawText((
-                "FPS: " +
-                std::to_string(GetFPS()) +
-                " (" + delta_stream.str() + "ms)"
-            ).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("FPS: " + std::to_string(GetFPS()) + " (" + delta_stream.str() + "ms)").c_str(), 2, pos_y, 20, DARKGREEN);
             pos_y += 20;
 
-            DrawText((
-                "Player position: " +
-                std::to_string(this->player.bounds.x) + "u " +
-                std::to_string(this->player.bounds.y) + "u"
-            ).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Player position: " + std::to_string(this->player.bounds.x) + "u " + std::to_string(this->player.bounds.y) + "u").c_str(), 2, pos_y, 20,
+                DARKGREEN);
             pos_y += 20;
 
-            DrawText((
-                "Cam position: " +
-                std::to_string(camera.target.x) + "px " +
-                std::to_string(camera.target.y) + "px"
-            ).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Cam position: " + std::to_string(camera.target.x) + "px " + std::to_string(camera.target.y) + "px").c_str(), 2, pos_y, 20, DARKGREEN);
             pos_y += 20;
 
-            DrawText((
-                "Player Velocity: " +
-                std::to_string(this->player.lastVelocity.x) + "u " +
-                std::to_string(this->player.lastVelocity.y) + "u"
-            ).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Player Velocity: " + std::to_string(this->player.lastVelocity.x) + "u " + std::to_string(this->player.lastVelocity.y) + "u").c_str(), 2,
+                pos_y, 20, DARKGREEN);
             pos_y += 20;
 
-            DrawText((
-                "World size: " +
-                std::to_string(this->world.world_size_x * this->world.Data[0][0]->chunk_size_x) + "u " +
-                std::to_string(this->world.world_size_y * this->world.Data[0][0]->chunk_size_y) + "u"
-            ).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("World size: " + std::to_string(this->world.world_size_x * this->world.Data[0][0]->chunk_size_x) + "u " +
+                         std::to_string(this->world.world_size_y * this->world.Data[0][0]->chunk_size_y) + "u")
+                         .c_str(),
+                2, pos_y, 20, DARKGREEN);
             pos_y += 20;
 
             if (smooth_cam) {
@@ -158,10 +132,7 @@ namespace Engine {
             }
             pos_y += 20;
 
-            DrawText((
-                "Tiles drawn: " +
-                std::to_string(tiles_drawn)
-            ).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Tiles drawn: " + std::to_string(tiles_drawn)).c_str(), 2, pos_y, 20, DARKGREEN);
             pos_y += 20;
         }
         EndDrawing();
@@ -173,10 +144,7 @@ namespace Engine {
         static float fraction_speed = 3.0f;
         Vector2 v_offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
         this->camera.offset = v_offset;
-        Vector2 diff = Vector2Subtract(
-            this->camera_target,
-            this->camera.target
-        );
+        Vector2 diff = Vector2Subtract(this->camera_target, this->camera.target);
         float length = Vector2Length(diff);
 
         if (length > min_effect_length) {
@@ -185,7 +153,5 @@ namespace Engine {
         }
     }
 
-    bool Game::ShouldClose() {
-        return WindowShouldClose();
-    }
-}
+    bool Game::ShouldClose() { return WindowShouldClose(); }
+}  // namespace Engine

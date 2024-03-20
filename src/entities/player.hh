@@ -7,15 +7,15 @@
 namespace Engine {
     namespace Entities {
         class Player : public Entity {
-        private:
+           private:
             int health;
 
-        public:
+           public:
             Player();
             Player(World::World* world);
             ~Player();
 
             void Update(bool debug = false) override;
         };
-    }
-}
+    }  // namespace Entities
+}  // namespace Engine

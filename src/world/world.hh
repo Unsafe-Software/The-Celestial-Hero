@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
+
 #include "tiles.hh"
 
 namespace Engine {
     namespace World {
         class Chunk {
-        public:
+           public:
             const static int chunk_size_x = 16;
             const static int chunk_size_y = 16;
             Tile Data[chunk_size_y][chunk_size_x];
@@ -24,7 +25,7 @@ namespace Engine {
         };
 
         class World {
-        public:
+           public:
             int world_size_x;
             int world_size_y;
             std::vector<std::vector<Chunk*>> Data;
@@ -40,5 +41,5 @@ namespace Engine {
             Tile GetCell(int y, int x);
             Tile GetCellByChunk(int chunk_y, int chunk_x, int in_chunk_y, int in_chunk_x);
         };
-    }
-}
+    }  // namespace World
+}  // namespace Engine

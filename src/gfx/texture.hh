@@ -1,17 +1,17 @@
 #pragma once
-#include <vector>
+#include <raylib.h>
+#include <yaml-cpp/yaml.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include <raylib.h>
-#include <yaml-cpp/yaml.h>
 
 namespace Engine {
     namespace Graphics {
         class TextureFromAtlas {
             Rectangle source;
-            
-        public:
+
+           public:
             TextureFromAtlas(Rectangle Source);
             TextureFromAtlas(int Pos_x, int Pos_y, int Size_x, int Size_y);
             void Draw(Texture2D texture, Rectangle Destination, float Rotation);
@@ -24,7 +24,7 @@ namespace Engine {
             std::vector<TextureFromAtlas> textures;
             YAML::Node config;
 
-        public:
+           public:
             Textures();
             Textures(std::string Config_path);
             Textures(YAML::Node Config);
@@ -34,5 +34,5 @@ namespace Engine {
             std::vector<TextureFromAtlas> GetTextures();
             Texture2D GetTexture();
         };
-    }
-}
+    }  // namespace Graphics
+}  // namespace Engine
