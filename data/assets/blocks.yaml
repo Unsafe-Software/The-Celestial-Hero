@@ -10,9 +10,6 @@ textures:
   - stone:
     pos_x: 32
     pos_y: 0
-  - air_cave:
-    pos_x: 64
-    pos_y: 0
   - debug:
     pos_x: 64
     pos_y: 0
