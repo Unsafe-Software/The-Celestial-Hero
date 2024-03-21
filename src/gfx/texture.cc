@@ -37,7 +37,6 @@ namespace Engine {
             }
 
             texture = LoadTexture(texture_atlas_path.c_str());
-            std::cout << "Test 1" << std::endl;
         }
 
         Textures::Textures(YAML::Node Config) {

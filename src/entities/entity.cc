@@ -31,6 +31,12 @@ namespace Engine {
             if (noClip == false) {
                 Vector2 newPos = {this->bounds.x + offset.x, this->bounds.y + offset.y};
                 this->ResolveWorldCollisions(newPos, debug);
+                if (this->bounds.x < 0) this->bounds.x = 0;
+                if (this->bounds.y < 0) this->bounds.y = 0;
+                if (this->bounds.x > this->world->world_size_x * this->world->Data[0][0]->chunk_size_x - this->bounds.width)
+                    this->bounds.x = this->world->world_size_x * this->world->Data[0][0]->chunk_size_x - this->bounds.width;
+                if (this->bounds.y > this->world->world_size_y * this->world->Data[0][0]->chunk_size_y - this->bounds.height)
+                    this->bounds.y = this->world->world_size_y * this->world->Data[0][0]->chunk_size_y - this->bounds.height;
             } else {
                 this->bounds.x += offset.x;
                 this->bounds.y += offset.y;

@@ -54,8 +54,9 @@ namespace Engine {
     void Game::Update() {
         BeginDrawing();
         this->delta = GetFrameTime() * 1000.0f;
-        if (IsKeyPressed(KEY_F3)) debug = !debug;
-        if (IsKeyPressed(KEY_F4)) smooth_cam = !smooth_cam;
+        if (IsKeyPressed(KEY_F3)) this->debug = !this->debug;
+        if (IsKeyPressed(KEY_F4)) this->smooth_cam = !this->smooth_cam;
+        if (IsKeyPressed(KEY_F2)) this->player.noClip = !this->player.noClip;
         if (IsKeyDown(KEY_D)) this->player.AddForce({player_speed, 0});
         if (IsKeyDown(KEY_A)) this->player.AddForce({-player_speed, 0});
         if (IsKeyDown(KEY_W)) this->player.AddForce({0, -player_speed});
@@ -64,11 +65,7 @@ namespace Engine {
         this->player.Update();
 
         this->camera_target = (Vector2){this->player.bounds.x * this->tile_size, this->player.bounds.y * this->tile_size};
-        if (smooth_cam) {
-            this->updateCamera();
-        } else {
-            camera.target = this->camera_target;
-        }
+        this->updateCamera();
 
         ClearBackground(BLACK);
         BeginMode2D(camera);
@@ -112,7 +109,10 @@ namespace Engine {
                 DARKGREEN);
             pos_y += 20;
 
-            DrawText(("Cam position: " + std::to_string(camera.target.x) + "px " + std::to_string(camera.target.y) + "px").c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Cam target: " + std::to_string(camera_target.x) + "px " + std::to_string(camera_target.y) + "px").c_str(), 2, pos_y, 20, DARKGREEN);
+            pos_y += 20;
+
+            DrawText(("Cam offset: " + std::to_string(camera.offset.x) + "px " + std::to_string(camera.offset.y) + "px").c_str(), 2, pos_y, 20, DARKGREEN);
             pos_y += 20;
 
             DrawText(("Player Velocity: " + std::to_string(this->player.lastVelocity.x) + "u " + std::to_string(this->player.lastVelocity.y) + "u").c_str(), 2,
@@ -125,11 +125,10 @@ namespace Engine {
                 2, pos_y, 20, DARKGREEN);
             pos_y += 20;
 
-            if (smooth_cam) {
-                DrawText("Camera smooth mode (F4): TRUE", 0, pos_y, 20, DARKGREEN);
-            } else {
-                DrawText("Camera smooth mode (F4): FALSE", 0, pos_y, 20, DARKGREEN);
-            }
+            DrawText(("Smooth camera (F4): " + static_cast<std::string>(this->smooth_cam ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, DARKGREEN);
+            pos_y += 20;
+
+            DrawText(("No-clip mode (F2): " + static_cast<std::string>(this->player.noClip ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, DARKGREEN);
             pos_y += 20;
 
             DrawText(("Tiles drawn: " + std::to_string(tiles_drawn)).c_str(), 2, pos_y, 20, DARKGREEN);
@@ -139,17 +138,33 @@ namespace Engine {
     }
 
     void Game::updateCamera() {
-        static float min_speed = 10.0f;
-        static float min_effect_length = 2.5f;
-        static float fraction_speed = 3.0f;
-        Vector2 v_offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-        this->camera.offset = v_offset;
-        Vector2 diff = Vector2Subtract(this->camera_target, this->camera.target);
-        float length = Vector2Length(diff);
+        if (smooth_cam) {
+            static float min_speed = 10.0f;
+            static float min_effect_length = 2.5f;
+            static float fraction_speed = 3.0f;
+            Vector2 diff = Vector2Subtract(this->camera_target, this->camera.target);
+            float length = Vector2Length(diff);
 
-        if (length > min_effect_length) {
-            float speed = fmaxf(fraction_speed * length, min_speed);
-            this->camera.target = Vector2Add(this->camera.target, Vector2Scale(diff, speed * GetFrameTime() / length));
+            if (length > min_effect_length) {
+                float speed = fmaxf(fraction_speed * length, min_speed);
+                this->camera.target = Vector2Add(this->camera.target, Vector2Scale(diff, speed * GetFrameTime() / length));
+            }
+        } else {
+            this->camera.target = this->camera_target;
+        }
+
+        // Clamp camera target to map edges if no-clip is off
+        if (this->player.noClip == false) {
+            if (this->camera.target.x - this->camera.offset.x / this->camera.zoom < 0.0f) this->camera.target.x = this->camera.offset.x / this->camera.zoom;
+            if (this->camera.target.y - this->camera.offset.y / this->camera.zoom < 0.0f) this->camera.target.y = this->camera.offset.y / this->camera.zoom;
+            if (this->camera.target.x + this->camera.offset.x / this->camera.zoom >
+                this->world.world_size_x * this->world.Data[0][0]->chunk_size_x * this->tile_size)
+                this->camera.target.x =
+                    this->world.world_size_x * this->world.Data[0][0]->chunk_size_x * this->tile_size - this->camera.offset.x / this->camera.zoom;
+            if (this->camera.target.y + this->camera.offset.y / this->camera.zoom >
+                this->world.world_size_y * this->world.Data[0][0]->chunk_size_y * this->tile_size)
+                this->camera.target.y =
+                    this->world.world_size_y * this->world.Data[0][0]->chunk_size_y * this->tile_size - this->camera.offset.y / this->camera.zoom;
         }
     }
 
