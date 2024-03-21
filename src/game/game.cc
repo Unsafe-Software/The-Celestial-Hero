@@ -51,12 +51,19 @@ namespace Engine {
         CloseWindow();
     }
 
+    std::string convert_float_str(float num) {
+        std::ostringstream stream;
+        stream << std::fixed << std::setprecision(3) << num;
+        return stream.str();
+    }
+
     void Game::Update() {
         BeginDrawing();
         this->delta = GetFrameTime() * 1000.0f;
         if (IsKeyPressed(KEY_F3)) this->debug = !this->debug;
         if (IsKeyPressed(KEY_F4)) this->smooth_cam = !this->smooth_cam;
         if (IsKeyPressed(KEY_F2)) this->player.noClip = !this->player.noClip;
+        if (IsKeyPressed(KEY_F1)) this->draw_hitboxes = !this->draw_hitboxes;
         if (IsKeyDown(KEY_D)) this->player.AddForce({player_speed, 0});
         if (IsKeyDown(KEY_A)) this->player.AddForce({-player_speed, 0});
         if (IsKeyDown(KEY_W)) this->player.AddForce({0, -player_speed});
@@ -93,45 +100,68 @@ namespace Engine {
 
         // Entities
         this->player.Draw(tile_size);
+        if (this->draw_hitboxes) {
+            // Draw player hitbox
+            DrawRectangleLinesEx({this->player.bounds.x * this->tile_size, this->player.bounds.y * this->tile_size, this->player.bounds.width * this->tile_size,
+                                     this->player.bounds.height * this->tile_size},
+                1, BLUE);
+            // Draw tiles hitboxes
+            for (Rectangle tile : Entities::GetPossibleCollidingTiles(&this->world, this->player.bounds)) {
+                DrawRectangleLinesEx({tile.x, tile.y, tile.width, tile.height}, 1, BLUE);
+            }
+            // Draw chunk boundaries
+            for (int y = 0; y < this->world.world_size_y; ++y) {
+                for (int x = 0; x < this->world.world_size_x; ++x) {
+                    DrawRectangleLinesEx(
+                        {(float)x * tile_size * this->world.Data[0][0]->chunk_size_x, (float)y * tile_size * this->world.Data[0][0]->chunk_size_y,
+                            (float)this->world.Data[0][0]->chunk_size_x * tile_size, (float)this->world.Data[0][0]->chunk_size_y * tile_size},
+                        1, GREEN);
+                }
+            }
+        }
         EndMode2D();
 
         if (debug) {
             int pos_y = 2;
-            DrawText("Debug mode (F3): TRUE", 2, pos_y, 20, DARKGREEN);
+            auto color = DARKGRAY;
+
+            DrawText(("FPS: " + std::to_string(GetFPS()) + " (" + convert_float_str(GetFrameTime()) + "ms)").c_str(), 2, pos_y, 20, color);
             pos_y += 20;
 
-            std::ostringstream delta_stream;
-            delta_stream << std::fixed << std::setprecision(3) << GetFrameTime() * 1000;
-            DrawText(("FPS: " + std::to_string(GetFPS()) + " (" + delta_stream.str() + "ms)").c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Player position: " + convert_float_str(this->player.bounds.x) + "u " + convert_float_str(this->player.bounds.y) + "u").c_str(), 2, pos_y,
+                20, color);
             pos_y += 20;
 
-            DrawText(("Player position: " + std::to_string(this->player.bounds.x) + "u " + std::to_string(this->player.bounds.y) + "u").c_str(), 2, pos_y, 20,
-                DARKGREEN);
+            DrawText(
+                ("Player Velocity: " + convert_float_str(this->player.lastVelocity.x) + "u " + convert_float_str(this->player.lastVelocity.y) + "u").c_str(), 2,
+                pos_y, 20, color);
             pos_y += 20;
 
-            DrawText(("Cam target: " + std::to_string(camera_target.x) + "px " + std::to_string(camera_target.y) + "px").c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Camera target: " + convert_float_str(this->camera_target.x) + "px " + convert_float_str(this->camera_target.y) + "px").c_str(), 2, pos_y,
+                20, color);
             pos_y += 20;
 
-            DrawText(("Cam offset: " + std::to_string(camera.offset.x) + "px " + std::to_string(camera.offset.y) + "px").c_str(), 2, pos_y, 20, DARKGREEN);
-            pos_y += 20;
-
-            DrawText(("Player Velocity: " + std::to_string(this->player.lastVelocity.x) + "u " + std::to_string(this->player.lastVelocity.y) + "u").c_str(), 2,
-                pos_y, 20, DARKGREEN);
-            pos_y += 20;
-
-            DrawText(("World size: " + std::to_string(this->world.world_size_x * this->world.Data[0][0]->chunk_size_x) + "u " +
+            DrawText(("World size: " + std::to_string(this->world.world_size_x) + "ch " + std::to_string(this->world.world_size_y) + "ch || " +
+                         std::to_string(this->world.world_size_x * this->world.Data[0][0]->chunk_size_x) + "u " +
                          std::to_string(this->world.world_size_y * this->world.Data[0][0]->chunk_size_y) + "u")
                          .c_str(),
-                2, pos_y, 20, DARKGREEN);
+                2, pos_y, 20, color);
             pos_y += 20;
 
-            DrawText(("Smooth camera (F4): " + static_cast<std::string>(this->smooth_cam ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("Tiles drawn: " + std::to_string(tiles_drawn)).c_str(), 2, pos_y, 20, color);
             pos_y += 20;
 
-            DrawText(("No-clip mode (F2): " + static_cast<std::string>(this->player.noClip ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, DARKGREEN);
+            pos_y += 40;
+            DrawText(("Draw hitboxes (F1): " + static_cast<std::string>(this->draw_hitboxes ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, color);
             pos_y += 20;
 
-            DrawText(("Tiles drawn: " + std::to_string(tiles_drawn)).c_str(), 2, pos_y, 20, DARKGREEN);
+            DrawText(("No-clip mode (F2): " + static_cast<std::string>(this->player.noClip ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, color);
+            pos_y += 20;
+
+            DrawText("Debug mode (F3): TRUE", 2, pos_y, 20, color);
+            pos_y += 20;
+
+            DrawText(("Smooth camera (F4): " + static_cast<std::string>(this->smooth_cam ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, color);
             pos_y += 20;
         }
         EndDrawing();

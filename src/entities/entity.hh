@@ -8,6 +8,8 @@
 
 namespace Engine {
     namespace Entities {
+        std::vector<Rectangle> GetPossibleCollidingTiles(World::World* world, Rectangle bounds);
+
         class Entity {
            public:
             Rectangle bounds;

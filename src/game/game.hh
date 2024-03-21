@@ -23,6 +23,7 @@ namespace Engine {
         Vector2 camera_target;
         bool debug;
         bool smooth_cam;
+        bool draw_hitboxes;
         int tile_size;
         float player_speed;
         float delta;

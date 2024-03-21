@@ -2,6 +2,20 @@
 
 namespace Engine {
     namespace Entities {
+        std::vector<Rectangle> GetPossibleCollidingTiles(World::World* world, Rectangle bounds) {
+            std::vector<Rectangle> collidingTiles = {};
+            for (int x = round(bounds.x) - 2; x < round(bounds.x) + 3; x++) {
+                for (int y = round(bounds.y) - 2; y < round(bounds.y) + 4; y++) {
+                    if (x < 0 || y < 0 || x >= world->world_size_x * world->Data[0][0]->chunk_size_x ||
+                        y >= world->world_size_y * world->Data[0][0]->chunk_size_y) {
+                        continue;
+                    }
+                    if (isSolid(world->GetCell(y, x))) collidingTiles.push_back({x * 16.0f, y * 16.0f, 16.0f, 16.0f});
+                }
+            }
+            return collidingTiles;
+        }
+
         Entity::Entity() {
             this->bounds = {0.0f, 0.0f, 16.0f, 16.0f};
             this->velocity = {0.0f, 0.0f};
@@ -56,16 +70,7 @@ namespace Engine {
         }
 
         void Entity::ResolveWorldCollisions(const Vector2 newPlayerPos, bool debug) {
-            std::vector<Rectangle> collidingTiles = {};
-            for (int x = round(this->bounds.x) - 2; x < round(this->bounds.x) + 3; x++) {
-                for (int y = round(this->bounds.y) - 2; y < round(this->bounds.y) + 3; y++) {
-                    if (x < 0 || y < 0 || x >= this->world->world_size_x * this->world->Data[0][0]->chunk_size_x ||
-                        y >= this->world->world_size_y * this->world->Data[0][0]->chunk_size_y) {
-                        continue;
-                    }
-                    if (isSolid(this->world->GetCell(y, x))) collidingTiles.push_back({x * 16.0f, y * 16.0f, 16.0f, 16.0f});
-                }
-            }
+            std::vector<Rectangle> collidingTiles = GetPossibleCollidingTiles(this->world, this->bounds);
             Vector2 resultPlayerPos = {newPlayerPos.x * 16.0f, newPlayerPos.y * 16.0f};
             for (Rectangle tile : collidingTiles) {
                 resultPlayerPos = this->ResolveCollisionBox(
