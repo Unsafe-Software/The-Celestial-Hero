@@ -17,6 +17,9 @@ namespace Engine {
                 : "The Celestial Hero");
         SetTargetFPS((this->config["startup"]["window"]["target_fps"]) ? this->config["startup"]["window"]["target_fps"].as<int>() : 60);
 
+        Image icon = LoadImage("./data/assets/icon.png");
+        SetWindowIcon(icon);
+
         this->blocks = Graphics::Textures("./data/assets/blocks.yaml");
         this->world = World::World((this->config["world"]["width"]) ? this->config["world"]["width"].as<int>() : 10,
             (this->config["world"]["height"]) ? this->config["world"]["height"].as<int>() : 5),
