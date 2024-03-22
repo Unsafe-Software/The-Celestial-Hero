@@ -1,4 +1,4 @@
-texture_atlas: "./data/assets/blocks.png"
+texture_atlas: "./data/assets/tiles/blocks.png"
 
 textures:
   - air:

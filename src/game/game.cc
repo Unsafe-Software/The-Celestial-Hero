@@ -17,10 +17,10 @@ namespace Engine {
                 : "The Celestial Hero");
         SetTargetFPS((this->config["startup"]["window"]["target_fps"]) ? this->config["startup"]["window"]["target_fps"].as<int>() : 60);
 
-        Image icon = LoadImage("./data/assets/icon.png");
+        Image icon = LoadImage("./data/assets/icons/icon.png");
         SetWindowIcon(icon);
 
-        this->blocks = Graphics::Textures("./data/assets/blocks.yaml");
+        this->blocks = Graphics::Textures("./data/assets/tiles/blocks.yaml");
         this->world = World::World((this->config["world"]["width"]) ? this->config["world"]["width"].as<int>() : 10,
             (this->config["world"]["height"]) ? this->config["world"]["height"].as<int>() : 5),
         this->player = Entities::Player(&this->world);
@@ -46,13 +46,7 @@ namespace Engine {
             (this->config["player"]["move_speed"]) ? this->config["player"]["move_speed"].as<float>() / this->tile_size : 1.0f / this->tile_size;
     }
 
-    Game::~Game() {
-        delete &this->player;
-        delete &this->world;
-        delete &this->blocks;
-        delete &this->config;
-        CloseWindow();
-    }
+    Game::~Game() { CloseWindow(); }
 
     std::string convert_float_str(float num) {
         std::ostringstream stream;
@@ -166,6 +160,9 @@ namespace Engine {
 
             DrawText(("Smooth camera (F4): " + static_cast<std::string>(this->smooth_cam ? "TRUE" : "FALSE")).c_str(), 2, pos_y, 20, color);
             pos_y += 20;
+
+            pos_y += 40;
+            DrawText("Save as debug: (F8)", 2, pos_y, 20, color);
         }
         EndDrawing();
     }

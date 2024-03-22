@@ -6,10 +6,12 @@ set(CMAKE_CXX_STANDARD 11)
 file(
   COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  PATTERN "*.aseprite" EXCLUDE
 )
 
 # --- Libraries ---
 include(FetchContent)
+
 # Raylib
 FetchContent_Declare(
   raylib
@@ -17,6 +19,7 @@ FetchContent_Declare(
   GIT_TAG "5.0"
 )
 FetchContent_MakeAvailable(raylib)
+
 # JSON
 FetchContent_Declare(
   yaml-cpp
@@ -24,6 +27,7 @@ FetchContent_Declare(
   GIT_TAG "0.8.0"
 )
 FetchContent_GetProperties(yaml-cpp)
+
 if(NOT yaml-cpp_POPULATED)
   message(STATUS "Fetching yaml-cpp...")
   FetchContent_Populate(yaml-cpp)
