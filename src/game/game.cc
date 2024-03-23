@@ -23,10 +23,10 @@ namespace Engine {
         this->blocks = Graphics::Textures("./data/assets/tiles/blocks.yaml");
         this->world = World::World((this->config["world"]["width"]) ? this->config["world"]["width"].as<int>() : 10,
             (this->config["world"]["height"]) ? this->config["world"]["height"].as<int>() : 5),
+        World::GenerateWorld(&this->world, 321);
         this->player = Entities::Player(&this->world);
 
         this->blocks.LoadAll();
-        World::GenerateWorld(&this->world);
         this->tile_size = (this->config["tile_size"]) ? this->config["tile_size"].as<int>() : 16;
 
         this->camera = {};
@@ -35,10 +35,15 @@ namespace Engine {
         this->camera.rotation = 0.0f;
         this->camera.zoom = (this->config["zoom"]) ? this->config["zoom"].as<float>() : 1.0f;
 
-        this->player.bounds.x = this->world.world_size_x * this->world.Data[0][0]->chunk_size_x / 2;
-        this->player.bounds.y = this->world.world_size_y * this->world.Data[0][0]->chunk_size_y / 2 - 10;
         this->player.bounds.width = 1;
         this->player.bounds.height = 2;
+        this->player.bounds.x = this->world.world_size_x * this->world.Data[0][0]->chunk_size_x / 2;
+        for (int y = 0; y < this->world.world_size_y * this->world.Data[0][0]->chunk_size_y; y++) {
+            if (World::isSolid(this->world.GetCell(y, this->world.world_size_x * this->world.Data[0][0]->chunk_size_x / 2))) {
+                this->player.bounds.y = y - this->player.bounds.height;
+                break;
+            }
+        }
 
         this->debug = (this->config["debug"]) ? this->config["debug"].as<bool>() : false;
         this->smooth_cam = (this->config["smooth_cam"]) ? this->config["smooth_cam"].as<bool>() : false;
@@ -79,8 +84,9 @@ namespace Engine {
                 if (CheckCollisionRecs(
                         (Rectangle){(float)x * tile_size * this->world.Data[0][0]->chunk_size_x, (float)y * tile_size * this->world.Data[0][0]->chunk_size_y,
                             (float)this->world.Data[0][0]->chunk_size_x * tile_size, (float)this->world.Data[0][0]->chunk_size_y * tile_size},
-                        (Rectangle){camera.target.x - GetScreenWidth() / 2, camera.target.y - GetScreenHeight() / 2, (float)GetScreenWidth(),
-                            (float)GetScreenHeight()})) {
+                        (Rectangle){(this->camera.target.x - this->camera.offset.x / this->camera.zoom),
+                            (this->camera.target.y - this->camera.offset.y / this->camera.zoom), this->camera.target.x + GetScreenWidth(),
+                            this->camera.target.y + GetScreenHeight()})) {
                     for (int chunk_y = 0; chunk_y < this->world.Data[0][0]->chunk_size_y; ++chunk_y) {
                         for (int chunk_x = 0; chunk_x < this->world.Data[0][0]->chunk_size_x; ++chunk_x) {
                             this->blocks.GetTextureI(this->world.GetCellByChunk(y, x, chunk_y, chunk_x))

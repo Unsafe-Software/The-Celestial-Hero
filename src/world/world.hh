@@ -7,8 +7,8 @@ namespace Engine {
     namespace World {
         class Chunk {
            public:
-            const static int chunk_size_x = 16;
-            const static int chunk_size_y = 16;
+            const static int chunk_size_x = 32;
+            const static int chunk_size_y = 32;
             Tile Data[chunk_size_y][chunk_size_x];
 
             Chunk();

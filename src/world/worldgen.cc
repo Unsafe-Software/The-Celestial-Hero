@@ -2,30 +2,31 @@
 
 namespace Engine {
     namespace World {
-        void GenerateWorld(World* world) {
-            int world_size_y_blocks = world->world_size_y * world->Data[0][0]->chunk_size_y;
-            int world_size_x_blocks = world->world_size_x * world->Data[0][0]->chunk_size_x;
+        void GenerateWorld(World* world, int seed) {
+            int world_size_y = world->world_size_y * world->Data[0][0]->chunk_size_y;
+            int world_size_x = world->world_size_x * world->Data[0][0]->chunk_size_x;
 
-            for (int x = 0; x < world_size_x_blocks; ++x) {
-                float loc_x = x / 3;
-                int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) +
-                            world_size_y_blocks / 2;
-                for (int y = 0; y < world_size_y_blocks; ++y) {
-                    if (y > noise) {
+            int noise_map[world_size_x];
+            PerlinNoise noise(seed);
+            for (int x = 0; x < world_size_x; ++x) {
+                double nx = static_cast<double>(x) / world_size_x;
+                noise_map[x] = static_cast<int>(25 * noise.noise(6 * nx)) + world_size_y / 3;
+            }
+
+            std::srand((unsigned)seed);
+            for (int x = 0; x < world_size_x; ++x) {
+                for (int y = 0; y < world_size_y; ++y) {
+                    if (y > noise_map[x]) {
                         world->SetCell(y, x, Stone);
                     }
                 }
             }
 
-            std::srand(0);
-            for (int y = 0; y < world_size_y_blocks; ++y) {
-                for (int x = 0; x < world_size_x_blocks; ++x) {
-                    float loc_x = x / 3;
-                    int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) +
-                                world_size_y_blocks / 2 + 10;
+            for (int y = 0; y < world_size_y; ++y) {
+                for (int x = 0; x < world_size_x; ++x) {
                     if (world->GetCell(y, x) == Stone)
                         if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.465) {
-                            if (y > noise)
+                            if (y > noise_map[x])
                                 world->SetCell(y, x, Bg);
                             else if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.1)
                                 world->SetCell(y, x, Bg);
@@ -35,11 +36,9 @@ namespace Engine {
             World* world_copy = world;
 
             for (int t = 0; t < 10; ++t) {
-                for (int y = 0; y < world_size_y_blocks; ++y) {
-                    for (int x = 0; x < world_size_x_blocks; ++x) {
-                        float loc_x = x / 3;
-                        int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) -
-                                    FACTOR_PI * sin(SCALE_PI * PI * loc_x) + world_size_y_blocks / 2 + 10;
+                for (int y = 0; y < world_size_y; ++y) {
+                    for (int x = 0; x < world_size_x; ++x) {
+                        int noise = noise_map[x];
                         int stone_tiles = 0;
                         int air_tiles = 0;
                         for (int i = -1; i <= 1; ++i) {
@@ -69,8 +68,8 @@ namespace Engine {
                 world_copy = world;
             }
 
-            for (int y = 0; y < world_size_y_blocks; ++y) {
-                for (int x = 0; x < world_size_x_blocks; ++x) {
+            for (int y = 0; y < world_size_y; ++y) {
+                for (int x = 0; x < world_size_x; ++x) {
                     if (world->GetCell(y, x) == Stone)
                         if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.43) world->SetCell(y, x, Dirt);
                 }
@@ -78,8 +77,8 @@ namespace Engine {
             world_copy = world;
 
             for (int t = 0; t < 10; ++t) {
-                for (int y = 0; y < world_size_y_blocks; ++y) {
-                    for (int x = 0; x < world_size_x_blocks; ++x) {
+                for (int y = 0; y < world_size_y; ++y) {
+                    for (int x = 0; x < world_size_x; ++x) {
                         int stone_tiles = 0;
                         int dirt_tiles = 0;
                         for (int i = -1; i <= 1; ++i) {
@@ -97,18 +96,16 @@ namespace Engine {
                 world_copy = world;
             }
 
-            for (int x = 0; x < world_size_x_blocks; ++x) {
-                float loc_x = x / 3;
-                int noise = FACTOR_GLOB * (FACTOR1 * sin(SCALE1 * loc_x)) - FACTOR_E * sin(SCALE_E * E * loc_x) - FACTOR_PI * sin(SCALE_PI * PI * loc_x) +
-                            world_size_y_blocks / 2;
-                for (int y = 0; y < world_size_y_blocks; ++y) {
+            for (int x = 0; x < world_size_x; ++x) {
+                int noise = noise_map[x];
+                for (int y = 0; y < world_size_y; ++y) {
                     if (y > noise && y < noise + 5) world->SetCell(y, x, Dirt);
                 }
             }
 
             for (int t = 0; t < 10; ++t) {
-                for (int y = 0; y < world_size_y_blocks; ++y) {
-                    for (int x = 0; x < world_size_x_blocks; ++x) {
+                for (int y = 0; y < world_size_y; ++y) {
+                    for (int x = 0; x < world_size_x; ++x) {
                         int stone_tiles = 0;
                         int dirt_tiles = 0;
                         for (int i = -1; i <= 1; ++i) {
@@ -127,7 +124,7 @@ namespace Engine {
             }
 
             bool last_tree_grown = false;
-            for (int x = 0; x < world_size_x_blocks; ++x) {
+            for (int x = 0; x < world_size_x; ++x) {
                 bool found_first_block = false;
                 bool grow_tree = false;
                 if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 0.2) {
@@ -140,7 +137,7 @@ namespace Engine {
                 int tree_height = 0;
                 bool tree_grown = false;
 
-                for (int y = 0; y < world_size_y_blocks; ++y) {
+                for (int y = 0; y < world_size_y; ++y) {
                     if (world->GetCell(y, x) == Dirt) {
                         if (!found_first_block) {
                             found_first_block = true;

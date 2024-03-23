@@ -26,7 +26,15 @@ FetchContent_Declare(
   GIT_REPOSITORY "https://github.com/jbeder/yaml-cpp.git"
   GIT_TAG "0.8.0"
 )
-FetchContent_GetProperties(yaml-cpp)
+FetchContent_MakeAvailable(yaml-cpp)
+
+# XML
+FetchContent_Declare(
+  pugixml
+  GIT_REPOSITORY "https://github.com/zeux/pugixml.git"
+  GIT_TAG "v1.14"
+)
+FetchContent_MakeAvailable(pugixml)
 
 if(NOT yaml-cpp_POPULATED)
   message(STATUS "Fetching yaml-cpp...")
@@ -36,7 +44,7 @@ endif()
 
 # --- Executables ---
 # Game
-file(GLOB Sources src/*.cc src/gfx/*.cc src/world/*.cc src/entities/*.cc src/game/*.cc)
+file(GLOB Sources "src/*.cc" "src/*/*.cc")
 add_compile_definitions("RELEASE=$<CONFIG:Release>")
 add_executable("${PROJECT_NAME}" ${Sources})
 target_link_libraries("${PROJECT_NAME}" raylib yaml-cpp::yaml-cpp)
