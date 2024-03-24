@@ -1,4 +1,5 @@
 #pragma once
+#include <glog/logging.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <yaml-cpp/yaml.h>
@@ -9,6 +10,7 @@
 #include "../entities/entity.hh"
 #include "../entities/player.hh"
 #include "../gfx/texture.hh"
+#include "../saves/saves.hh"
 #include "../world/world.hh"
 #include "../world/worldgen.hh"
 

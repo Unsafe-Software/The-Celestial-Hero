@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(The-Celestial-Hero VERSION 0.0.0 LANGUAGES C CXX)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # --- Data ---
 file(
@@ -36,6 +36,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pugixml)
 
+# Glog
+FetchContent_Declare(
+  glog
+  GIT_REPOSITORY "https://github.com/google/glog.git"
+  GIT_TAG "v0.6.0"
+)
+FetchContent_MakeAvailable(glog)
+
 if(NOT yaml-cpp_POPULATED)
   message(STATUS "Fetching yaml-cpp...")
   FetchContent_Populate(yaml-cpp)
@@ -47,7 +55,7 @@ endif()
 file(GLOB Sources "src/*.cc" "src/*/*.cc")
 add_compile_definitions("RELEASE=$<CONFIG:Release>")
 add_executable("${PROJECT_NAME}" ${Sources})
-target_link_libraries("${PROJECT_NAME}" raylib yaml-cpp::yaml-cpp)
+target_link_libraries("${PROJECT_NAME}" raylib yaml-cpp::yaml-cpp glog::glog)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

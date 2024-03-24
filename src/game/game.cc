@@ -1,14 +1,18 @@
 #include "game.hh"
 
-#include <iostream>
-
 namespace Engine {
     Game::Game() {
         this->config = YAML::LoadFile("./data/config.yaml");
-
-        if (!this->config["debug"] || this->config["debug"].as<bool>() != true) {
-            SetTraceLogLevel(LOG_WARNING);
+        SetTraceLogLevel(LOG_WARNING);
+        if (this->config["debug"] && this->config["debug"].as<bool>()) {
+            FLAGS_alsologtostderr = true;
+            google::InitGoogleLogging("The Celestial Hero");
         }
+
+        Saves::Save save("debug_save2");
+        save.SaveState();
+        save.ChechSave();
+
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         InitWindow((this->config["startup"]["window"]["width"]) ? this->config["startup"]["window"]["width"].as<int>() : 1280,
             (this->config["startup"]["window"]["height"]) ? this->config["startup"]["window"]["height"].as<int>() : 720,
